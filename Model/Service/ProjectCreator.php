@@ -13,24 +13,23 @@ use TattvaDesign\ImageEditorApi\Model\Util\UuidGenerator;
 class ProjectCreator
 {
     private const DEFAULT_STATUS = 'active';
-    private const ALLOWED_SIZES = ['a2', 'a3', 'a4', 'a5'];
 
     public function __construct(
         private readonly ResourceConnection $resourceConnection,
         private readonly StoreManagerInterface $storeManager,
-        private readonly UuidGenerator $uuidGenerator
+        private readonly UuidGenerator $uuidGenerator,
+        private readonly ProjectDataMapper $projectDataMapper,
+        private readonly ProjectResource $projectResource
     ) {
     }
 
     /**
      * Create a project for the authenticated customer in the current store.
+     *
+     * @param array{name: string, description: ?string, size: string} $input
      */
-    public function create(int $customerId, string $name, ?string $description, string $size): array
+    public function create(int $customerId, array $input): array
     {
-        if (!in_array($size, self::ALLOWED_SIZES, true)) {
-            throw new GraphQlInputException(__('The "size" value must be one of: a2, a3, a4, a5.'));
-        }
-
         $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('tattva_image_editor_project');
         $storeId = (int) $this->storeManager->getStore()->getId();
@@ -40,9 +39,9 @@ class ProjectCreator
             'uuid' => $uuid,
             'customer_id' => $customerId,
             'store_id' => $storeId,
-            'name' => $name,
-            'description' => $description,
-            'size' => $size,
+            'name' => $input['name'],
+            'description' => $input['description'],
+            'size' => $input['size'],
             'status' => self::DEFAULT_STATUS,
             'canvas_object' => null,
         ];
@@ -57,40 +56,8 @@ class ProjectCreator
 
         $projectId = (int) $connection->lastInsertId($tableName);
 
-        $row = $connection->fetchRow(
-            $connection->select()
-                ->from($tableName, [
-                    'id',
-                    'uuid',
-                    'customer_id',
-                    'store_id',
-                    'name',
-                    'description',
-                    'size',
-                    'status',
-                    'canvas_object',
-                    'created_at',
-                    'updated_at',
-                ])
-                ->where('id = ?', $projectId)
+        return $this->projectDataMapper->mapRow(
+            $this->projectResource->getProjectRowById($projectId)
         );
-
-        if (!$row) {
-            throw new GraphQlInputException(__('The project was created, but could not be loaded afterwards.'));
-        }
-
-        return [
-            'id' => (int) $row['id'],
-            'uuid' => (string) $row['uuid'],
-            'customerId' => (int) $row['customer_id'],
-            'storeId' => (int) $row['store_id'],
-            'name' => (string) $row['name'],
-            'description' => $row['description'] !== null ? (string) $row['description'] : null,
-            'size' => (string) $row['size'],
-            'status' => (string) $row['status'],
-            'canvasObject' => $row['canvas_object'] !== null ? (string) $row['canvas_object'] : null,
-            'createdAt' => (string) $row['created_at'],
-            'updatedAt' => (string) $row['updated_at'],
-        ];
     }
 }

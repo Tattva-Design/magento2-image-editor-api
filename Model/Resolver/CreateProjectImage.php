@@ -8,15 +8,15 @@ use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use TattvaDesign\ImageEditorApi\Model\Auth\CustomerContextValidator;
-use TattvaDesign\ImageEditorApi\Model\Service\ProjectCreator;
-use TattvaDesign\ImageEditorApi\Model\Validator\ProjectInputValidator;
+use TattvaDesign\ImageEditorApi\Model\Service\ProjectImageUploader;
+use TattvaDesign\ImageEditorApi\Model\Validator\ProjectImageInputValidator;
 
-class CreateProject implements ResolverInterface
+class CreateProjectImage implements ResolverInterface
 {
     public function __construct(
         private readonly CustomerContextValidator $customerContextValidator,
-        private readonly ProjectCreator $projectCreator,
-        private readonly ProjectInputValidator $projectInputValidator
+        private readonly ProjectImageInputValidator $projectImageInputValidator,
+        private readonly ProjectImageUploader $projectImageUploader
     ) {
     }
 
@@ -31,11 +31,8 @@ class CreateProject implements ResolverInterface
         ?array $args = null
     ): array {
         $customerId = $this->customerContextValidator->getCustomerId($context);
-        $input = $args['input'] ?? [];
+        $input = $this->projectImageInputValidator->validateCreateInput($args['input'] ?? []);
 
-        return $this->projectCreator->create(
-            $customerId,
-            $this->projectInputValidator->validateCreateInput($input)
-        );
+        return $this->projectImageUploader->upload($customerId, $input);
     }
 }

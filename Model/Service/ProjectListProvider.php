@@ -13,7 +13,8 @@ class ProjectListProvider
 {
     public function __construct(
         private readonly ResourceConnection $resourceConnection,
-        private readonly StoreManagerInterface $storeManager
+        private readonly StoreManagerInterface $storeManager,
+        private readonly ProjectDataMapper $projectDataMapper
     ) {
     }
 
@@ -67,7 +68,7 @@ class ProjectListProvider
 
         return [
             'totalCount' => $totalCount,
-            'items' => array_map([$this, 'mapRow'], $rows),
+            'items' => array_map([$this->projectDataMapper, 'mapRow'], $rows),
             'pageInfo' => [
                 'pageSize' => $pageSize,
                 'currentPage' => $currentPage,
@@ -75,29 +76,6 @@ class ProjectListProvider
                 'hasNextPage' => $currentPage < $totalPages,
                 'hasPreviousPage' => $currentPage > 1 && $totalCount > 0,
             ],
-        ];
-    }
-
-    /**
-     * Map a DB row into the GraphQL output shape.
-     *
-     * @param array<string, mixed> $row
-     * @return array<string, mixed>
-     */
-    private function mapRow(array $row): array
-    {
-        return [
-            'id' => (int) $row['id'],
-            'uuid' => (string) $row['uuid'],
-            'customerId' => (int) $row['customer_id'],
-            'storeId' => (int) $row['store_id'],
-            'name' => (string) $row['name'],
-            'description' => $row['description'] !== null ? (string) $row['description'] : null,
-            'size' => (string) $row['size'],
-            'status' => (string) $row['status'],
-            'canvasObject' => $row['canvas_object'] !== null ? (string) $row['canvas_object'] : null,
-            'createdAt' => (string) $row['created_at'],
-            'updatedAt' => (string) $row['updated_at'],
         ];
     }
 }

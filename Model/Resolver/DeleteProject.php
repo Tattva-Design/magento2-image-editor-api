@@ -5,18 +5,17 @@ declare(strict_types=1);
 namespace TattvaDesign\ImageEditorApi\Model\Resolver;
 
 use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use TattvaDesign\ImageEditorApi\Model\Auth\CustomerContextValidator;
-use TattvaDesign\ImageEditorApi\Model\Service\ProjectCreator;
-use TattvaDesign\ImageEditorApi\Model\Validator\ProjectInputValidator;
+use TattvaDesign\ImageEditorApi\Model\Service\ProjectDeleter;
 
-class CreateProject implements ResolverInterface
+class DeleteProject implements ResolverInterface
 {
     public function __construct(
         private readonly CustomerContextValidator $customerContextValidator,
-        private readonly ProjectCreator $projectCreator,
-        private readonly ProjectInputValidator $projectInputValidator
+        private readonly ProjectDeleter $projectDeleter
     ) {
     }
 
@@ -31,11 +30,12 @@ class CreateProject implements ResolverInterface
         ?array $args = null
     ): array {
         $customerId = $this->customerContextValidator->getCustomerId($context);
-        $input = $args['input'] ?? [];
+        $uuid = trim((string) ($args['uuid'] ?? ''));
 
-        return $this->projectCreator->create(
-            $customerId,
-            $this->projectInputValidator->validateCreateInput($input)
-        );
+        if ($uuid === '') {
+            throw new GraphQlInputException(__('The "uuid" value must be a non-empty string.'));
+        }
+
+        return $this->projectDeleter->delete($customerId, $uuid);
     }
 }
