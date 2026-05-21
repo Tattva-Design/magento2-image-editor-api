@@ -1,0 +1,50 @@
+type Query {
+    imageEditorProjects(
+        pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
+        currentPage: Int = 1 @doc(description: "The current results page, starting from 1.")
+    ): ImageEditorProjectListResult!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\Projects")
+    @doc(description: "Returns the current customer's image editor projects ordered by newest created first.")
+}
+
+type Mutation {
+    createImageEditorProject(
+        input: CreateImageEditorProjectInput!
+    ): ImageEditorProject!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CreateProject")
+    @doc(description: "Creates a new image editor project for the current customer in the current store.")
+}
+
+input CreateImageEditorProjectInput {
+    name: String! @doc(description: "The project name.")
+    description: String @doc(description: "The optional project description.")
+    size: String! @doc(description: "The project size value such as a2, a3, a4, or a5.")
+}
+
+type ImageEditorProjectListResult {
+    totalCount: Int! @doc(description: "The total number of matching projects.")
+    items: [ImageEditorProject!]! @doc(description: "The current page of projects.")
+    pageInfo: ImageEditorProjectPageInfo! @doc(description: "Pagination details for the current result set.")
+}
+
+type ImageEditorProjectPageInfo {
+    pageSize: Int! @doc(description: "How many items are returned per page.")
+    currentPage: Int! @doc(description: "The current results page.")
+    totalPages: Int! @doc(description: "The total number of available pages.")
+    hasNextPage: Boolean! @doc(description: "Whether another page exists after the current page.")
+    hasPreviousPage: Boolean! @doc(description: "Whether a page exists before the current page.")
+}
+
+type ImageEditorProject {
+    id: Int! @doc(description: "The internal numeric project ID.")
+    uuid: String! @doc(description: "The public project UUID.")
+    customerId: Int! @doc(description: "The owning customer ID.")
+    storeId: Int! @doc(description: "The owning store ID.")
+    name: String! @doc(description: "The project name.")
+    description: String @doc(description: "The project description.")
+    size: String! @doc(description: "The project size value such as a2, a3, a4, or a5.")
+    status: String! @doc(description: "The project status.")
+    canvasObject: String @doc(description: "The stored canvas object JSON string.")
+    createdAt: String! @doc(description: "The project creation timestamp.")
+    updatedAt: String! @doc(description: "The project last update timestamp.")
+}
