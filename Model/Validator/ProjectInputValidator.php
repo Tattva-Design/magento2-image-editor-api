@@ -17,8 +17,8 @@ class ProjectInputValidator
         $name = $this->requireNonEmptyString('name', $input['name'] ?? null);
         $size = $this->normalizeSize($input['size'] ?? null);
         $description = isset($input['description']) ? trim((string) $input['description']) : null;
-        $width = $this->validateDimension('width', $input['width'] ?? null, true);
-        $height = $this->validateDimension('height', $input['height'] ?? null, true);
+        $width = $this->validateDimension('width', $input['width'] ?? null);
+        $height = $this->validateDimension('height', $input['height'] ?? null);
 
         return [
             'name' => $name,
@@ -55,11 +55,11 @@ class ProjectInputValidator
         }
 
         if (array_key_exists('width', $input)) {
-            $updateData['width'] = $this->validateDimension('width', $input['width'], true);
+            $updateData['width'] = $this->validateDimension('width', $input['width']);
         }
 
         if (array_key_exists('height', $input)) {
-            $updateData['height'] = $this->validateDimension('height', $input['height'], true);
+            $updateData['height'] = $this->validateDimension('height', $input['height']);
         }
 
         if (array_key_exists('canvasObject', $input)) {
@@ -105,15 +105,12 @@ class ProjectInputValidator
         return $this->requireNonEmptyString('size', $value);
     }
 
-    private function validateDimension(string $fieldName, mixed $value, bool $required = false): ?int
+    private function validateDimension(string $fieldName, mixed $value): int
     {
         if ($value === null || trim((string)$value) === '') {
-            if ($required) {
-                throw new GraphQlInputException(
-                    __('The "%1" value must be a positive integer.', $fieldName)
-                );
-            }
-            return null;
+            throw new GraphQlInputException(
+                __('The "%1" value must be a positive integer.', $fieldName)
+            );
         }
 
         $intValue = (int) $value;
