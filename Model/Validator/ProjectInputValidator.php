@@ -14,11 +14,11 @@ class ProjectInputValidator
      */
     public function validateCreateInput(array $input): array
     {
-        $name = $this->requireNonEmptyString('name', $input['name'] ?? null);
-        $size = $this->normalizeSize($input['size'] ?? null);
+        $name = $this->requireNonEmptyString('name', $input['name']);
+        $size = $this->normalizeSize($input['size']);
         $description = isset($input['description']) ? trim((string) $input['description']) : null;
-        $width = $this->validateDimension('width', $input['width'] ?? null);
-        $height = $this->validateDimension('height', $input['height'] ?? null);
+        $width = $this->validateDimension('width', $input['width']);
+        $height = $this->validateDimension('height', $input['height']);
 
         return [
             'name' => $name,
