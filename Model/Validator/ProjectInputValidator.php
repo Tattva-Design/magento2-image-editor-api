@@ -8,22 +8,24 @@ use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 
 class ProjectInputValidator
 {
-    private const ALLOWED_SIZES = ['a2', 'a3', 'a4', 'a5'];
-
     /**
      * @param array<string, mixed> $input
-     * @return array{name: string, description: ?string, size: string}
+     * @return array{name: string, description: ?string, size: string, width: int, height: int}
      */
     public function validateCreateInput(array $input): array
     {
-        $name = $this->requireNonEmptyString('name', $input['name'] ?? null);
-        $size = $this->normalizeSize($input['size'] ?? null);
+        $name = $this->requireNonEmptyString('name', $input['name']);
+        $size = $this->normalizeSize($input['size']);
         $description = isset($input['description']) ? trim((string) $input['description']) : null;
+        $width = $this->validateDimension('width', $input['width']);
+        $height = $this->validateDimension('height', $input['height']);
 
         return [
             'name' => $name,
             'description' => $description !== '' ? $description : null,
             'size' => $size,
+            'width' => $width,
+            'height' => $height,
         ];
     }
 
@@ -50,6 +52,14 @@ class ProjectInputValidator
 
         if (array_key_exists('size', $input)) {
             $updateData['size'] = $this->normalizeSize($input['size']);
+        }
+
+        if (array_key_exists('width', $input)) {
+            $updateData['width'] = $this->validateDimension('width', $input['width']);
+        }
+
+        if (array_key_exists('height', $input)) {
+            $updateData['height'] = $this->validateDimension('height', $input['height']);
         }
 
         if (array_key_exists('canvasObject', $input)) {
@@ -92,12 +102,24 @@ class ProjectInputValidator
 
     private function normalizeSize(mixed $value): string
     {
-        $size = strtolower($this->requireNonEmptyString('size', $value));
+        return $this->requireNonEmptyString('size', $value);
+    }
 
-        if (!in_array($size, self::ALLOWED_SIZES, true)) {
-            throw new GraphQlInputException(__('The "size" value must be one of: a2, a3, a4, a5.'));
+    private function validateDimension(string $fieldName, mixed $value): int
+    {
+        if ($value === null || trim((string)$value) === '') {
+            throw new GraphQlInputException(
+                __('The "%1" value must be a positive integer.', $fieldName)
+            );
         }
 
-        return $size;
+        $intValue = (int) $value;
+        if ($intValue <= 0) {
+            throw new GraphQlInputException(
+                __('The "%1" value must be a positive integer.', $fieldName)
+            );
+        }
+
+        return $intValue;
     }
 }

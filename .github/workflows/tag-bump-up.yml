@@ -1,0 +1,17 @@
+name: Auto Bump + Tag from composer.json
+
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  bump_and_tag:
+    uses: Tattva-Design/tattva-ci-workflows/.github/workflows/tag-bump-up.yml@master

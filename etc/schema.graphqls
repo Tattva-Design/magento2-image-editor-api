@@ -46,14 +46,18 @@ type Mutation {
 input CreateImageEditorProjectInput {
     name: String! @doc(description: "The project name.")
     description: String @doc(description: "The optional project description.")
-    size: String! @doc(description: "The project size value such as a2, a3, a4, or a5.")
+    size: String! @doc(description: "The project size.")
+    width: Int! @doc(description: "The project width.")
+    height: Int! @doc(description: "The project height.")
 }
 
 input UpdateImageEditorProjectInput {
     uuid: String! @doc(description: "The project UUID.")
     name: String @doc(description: "The project name.")
     description: String @doc(description: "The optional project description.")
-    size: String @doc(description: "The project size value such as a2, a3, a4, or a5.")
+    size: String @doc(description: "The project size.")
+    width: Int @doc(description: "The optional project width.")
+    height: Int @doc(description: "The optional project height.")
     canvasObject: String @doc(description: "The canvas object JSON string.")
 }
 
@@ -105,7 +109,9 @@ type ImageEditorProject {
     storeId: Int! @doc(description: "The owning store ID.")
     name: String! @doc(description: "The project name.")
     description: String @doc(description: "The project description.")
-    size: String! @doc(description: "The project size value such as a2, a3, a4, or a5.")
+    size: String! @doc(description: "The project size.")
+    width: Int! @doc(description: "The project width.")
+    height: Int! @doc(description: "The project height.")
     status: String! @doc(description: "The project status.")
     canvasObject: String @doc(description: "The stored canvas object JSON string.")
     createdAt: String! @doc(description: "The project creation timestamp.")

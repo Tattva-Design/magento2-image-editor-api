@@ -1,0 +1,8 @@
+name: image-editor-api pipeline
+
+on:
+  pull_request:
+
+jobs:
+  branch-name-check:
+    uses: Tattva-Design/tattva-ci-workflows/.github/workflows/branch-name-check.yml@master
