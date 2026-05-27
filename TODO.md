@@ -1,0 +1,1 @@
+- Need check the auto update the tag when PR is merged, and update the tag when PR is merged.
