@@ -26,7 +26,7 @@ class ProjectCreator
     /**
      * Create a project for the authenticated customer in the current store.
      *
-     * @param array{name: string, description: ?string, size: string} $input
+     * @param array{name: string, description: ?string, size: string, width: ?int, height: ?int} $input
      */
     public function create(int $customerId, array $input): array
     {
@@ -42,6 +42,8 @@ class ProjectCreator
             'name' => $input['name'],
             'description' => $input['description'],
             'size' => $input['size'],
+            'width' => $input['width'] ?? null,
+            'height' => $input['height'] ?? null,
             'status' => self::DEFAULT_STATUS,
             'canvas_object' => null,
         ];

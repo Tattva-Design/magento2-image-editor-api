@@ -8,7 +8,9 @@
         <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" identity="false" comment="Store ID"/>
         <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Project Name"/>
         <column xsi:type="text" name="description" nullable="true" comment="Project Description"/>
-        <column xsi:type="varchar" name="size" nullable="false" length="10" comment="Project Size"/>
+        <column xsi:type="varchar" name="size" nullable="false" length="255" comment="Project Size"/>
+        <column xsi:type="int" name="width" padding="10" unsigned="true" nullable="false" identity="false" comment="Project Width"/>
+        <column xsi:type="int" name="height" padding="10" unsigned="true" nullable="false" identity="false" comment="Project Height"/>
         <column xsi:type="varchar" name="status" nullable="false" length="32" comment="Project Status"/>
         <column xsi:type="mediumtext" name="canvas_object" nullable="true" comment="Canvas Object JSON"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
