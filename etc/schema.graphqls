@@ -1,0 +1,144 @@
+type Query {
+    imageEditorProjects(
+        pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
+        currentPage: Int = 1 @doc(description: "The current results page, starting from 1.")
+    ): ImageEditorProjectListResult!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\Projects")
+    @doc(description: "Returns the current customer's image editor projects ordered by newest created first.")
+    imageEditorProjectImages(
+        projectUuid: String! @doc(description: "The project UUID.")
+        pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
+        currentPage: Int = 1 @doc(description: "The current results page, starting from 1.")
+        sort: ImageEditorProjectImageSortInput @doc(description: "Optional sort configuration.")
+    ): ImageEditorProjectImageListResult!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\ProjectImages")
+    @doc(description: "Returns the current customer's project images for the current store.")
+}
+
+type Mutation {
+    createImageEditorProject(
+        input: CreateImageEditorProjectInput!
+    ): ImageEditorProject!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CreateProject")
+    @doc(description: "Creates a new image editor project for the current customer in the current store.")
+    updateImageEditorProject(
+        input: UpdateImageEditorProjectInput!
+    ): ImageEditorProject!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\UpdateProject")
+    @doc(description: "Updates an existing image editor project for the current customer in the current store.")
+    deleteImageEditorProject(
+        uuid: String!
+    ): DeleteImageEditorProjectResult!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\DeleteProject")
+    @doc(description: "Deletes an existing image editor project for the current customer in the current store.")
+    createImageEditorProjectImage(
+        input: CreateImageEditorProjectImageInput!
+    ): ImageEditorProjectImage!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CreateProjectImage")
+    @doc(description: "Uploads an image to an existing project for the current customer in the current store.")
+    deleteImageEditorProjectImage(
+        imageUuid: String!
+    ): DeleteImageEditorProjectImageResult!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\DeleteProjectImage")
+    @doc(description: "Deletes an existing project image for the current customer in the current store.")
+}
+
+input CreateImageEditorProjectInput {
+    name: String! @doc(description: "The project name.")
+    description: String @doc(description: "The optional project description.")
+    size: String! @doc(description: "The project size value such as a2, a3, a4, or a5.")
+}
+
+input UpdateImageEditorProjectInput {
+    uuid: String! @doc(description: "The project UUID.")
+    name: String @doc(description: "The project name.")
+    description: String @doc(description: "The optional project description.")
+    size: String @doc(description: "The project size value such as a2, a3, a4, or a5.")
+    canvasObject: String @doc(description: "The canvas object JSON string.")
+}
+
+input CreateImageEditorProjectImageInput {
+    projectUuid: String! @doc(description: "The project UUID.")
+    originalName: String! @doc(description: "The original uploaded file name.")
+    base64Content: String! @doc(description: "The base64-encoded image data.")
+}
+
+type ImageEditorProjectListResult {
+    totalCount: Int! @doc(description: "The total number of matching projects.")
+    items: [ImageEditorProject!]! @doc(description: "The current page of projects.")
+    pageInfo: ImageEditorProjectPageInfo! @doc(description: "Pagination details for the current result set.")
+}
+
+input ImageEditorProjectImageSortInput {
+    field: ImageEditorProjectImageSortField = CREATED_AT @doc(description: "The image field to sort by.")
+    direction: ImageEditorSortDirection = DESC @doc(description: "The sort direction.")
+}
+
+enum ImageEditorProjectImageSortField {
+    CREATED_AT
+    NAME
+}
+
+enum ImageEditorSortDirection {
+    ASC
+    DESC
+}
+
+type ImageEditorProjectPageInfo {
+    pageSize: Int! @doc(description: "How many items are returned per page.")
+    currentPage: Int! @doc(description: "The current results page.")
+    totalPages: Int! @doc(description: "The total number of available pages.")
+    hasNextPage: Boolean! @doc(description: "Whether another page exists after the current page.")
+    hasPreviousPage: Boolean! @doc(description: "Whether a page exists before the current page.")
+}
+
+type ImageEditorProjectImageListResult {
+    totalCount: Int! @doc(description: "The total number of matching images.")
+    items: [ImageEditorProjectImage!]! @doc(description: "The current page of images.")
+    pageInfo: ImageEditorProjectPageInfo! @doc(description: "Pagination details for the current result set.")
+}
+
+type ImageEditorProject {
+    id: Int! @doc(description: "The internal numeric project ID.")
+    uuid: String! @doc(description: "The public project UUID.")
+    customerId: Int! @doc(description: "The owning customer ID.")
+    storeId: Int! @doc(description: "The owning store ID.")
+    name: String! @doc(description: "The project name.")
+    description: String @doc(description: "The project description.")
+    size: String! @doc(description: "The project size value such as a2, a3, a4, or a5.")
+    status: String! @doc(description: "The project status.")
+    canvasObject: String @doc(description: "The stored canvas object JSON string.")
+    createdAt: String! @doc(description: "The project creation timestamp.")
+    updatedAt: String! @doc(description: "The project last update timestamp.")
+}
+
+type DeleteImageEditorProjectResult {
+    uuid: String! @doc(description: "The deleted project UUID.")
+    success: Boolean! @doc(description: "Whether the project was deleted successfully.")
+}
+
+type DeleteImageEditorProjectImageResult {
+    imageUuid: String! @doc(description: "The deleted image UUID.")
+    success: Boolean! @doc(description: "Whether the project image was deleted successfully.")
+}
+
+type ImageEditorProjectImage {
+    id: Int! @doc(description: "The internal numeric project image ID.")
+    uuid: String! @doc(description: "The public project image UUID.")
+    projectId: Int! @doc(description: "The owning project ID.")
+    customerId: Int! @doc(description: "The owning customer ID.")
+    storeId: Int! @doc(description: "The owning store ID.")
+    type: String! @doc(description: "The image type.")
+    status: String! @doc(description: "The image status.")
+    fileName: String! @doc(description: "The stored file name.")
+    originalName: String! @doc(description: "The original uploaded file name.")
+    filePath: String! @doc(description: "The relative media path.")
+    fileUrl: String! @doc(description: "The browser-accessible media URL.")
+    mimeType: String! @doc(description: "The detected mime type.")
+    extension: String! @doc(description: "The stored file extension.")
+    sizeBytes: Int! @doc(description: "The image file size in bytes.")
+    width: Int @doc(description: "The image width in pixels.")
+    height: Int @doc(description: "The image height in pixels.")
+    createdAt: String! @doc(description: "The image creation timestamp.")
+    updatedAt: String! @doc(description: "The image last update timestamp.")
+}
