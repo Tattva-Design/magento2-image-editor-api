@@ -46,19 +46,7 @@ class ProjectListProvider
 
         $rows = $connection->fetchAll(
             $connection->select()
-                ->from($tableName, [
-                    'id',
-                    'uuid',
-                    'customer_id',
-                    'store_id',
-                    'name',
-                    'description',
-                    'size',
-                    'status',
-                    'canvas_object',
-                    'created_at',
-                    'updated_at',
-                ])
+                ->from($tableName, $this->projectDataMapper->getSelectColumns())
                 ->where('customer_id = ?', $customerId)
                 ->where('store_id = ?', $storeId)
                 ->order('created_at ' . Select::SQL_DESC)
