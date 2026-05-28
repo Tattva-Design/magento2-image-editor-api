@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TattvaDesign\ImageEditorApi\Model\Service;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use TattvaDesign\ImageEditorApi\Model\Validator\ProjectInputValidator;
 
 class ProjectUpdater
@@ -24,6 +25,14 @@ class ProjectUpdater
     {
         $projectRow = $this->projectResource->getProjectRowByUuid($customerId, $uuid);
         $updateData = $this->projectInputValidator->validateUpdateInput($input);
+
+        if (isset($updateData['name'])) {
+            if ($this->projectResource->isProjectNameExists($customerId, $updateData['name'], (int) $projectRow['id'])) {
+                throw new GraphQlInputException(
+                    __('A project with the name "%1" already exists.', $updateData['name'])
+                );
+            }
+        }
 
         try {
             $this->projectResource->getConnection()->update(
