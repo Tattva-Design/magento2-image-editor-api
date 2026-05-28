@@ -69,4 +69,23 @@ class ProjectResource
 
         return $row;
     }
+
+    /**
+     * Check if a project with the same name already exists for the customer.
+     */
+    public function isProjectNameExists(int $customerId, string $name, ?int $excludeProjectId = null): bool
+    {
+        $connection = $this->getConnection();
+        $select = $connection->select()
+            ->from($this->getTableName(), ['id'])
+            ->where('customer_id = ?', $customerId)
+            ->where('name = ?', trim($name));
+
+        if ($excludeProjectId !== null) {
+            $select->where('id != ?', $excludeProjectId);
+        }
+
+        return (bool) $connection->fetchOne($select);
+    }
 }
+

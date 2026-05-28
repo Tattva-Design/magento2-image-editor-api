@@ -33,6 +33,13 @@ class ProjectCreator
         $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('tattva_image_editor_project');
         $storeId = (int) $this->storeManager->getStore()->getId();
+
+        if ($this->projectResource->isProjectNameExists($customerId, $input['name'])) {
+            throw new GraphQlInputException(
+                __('A project with the name "%1" already exists.', $input['name'])
+            );
+        }
+
         $uuid = $this->uuidGenerator->generate();
 
         $data = [
