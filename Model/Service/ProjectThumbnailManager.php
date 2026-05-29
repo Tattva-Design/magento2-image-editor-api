@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TattvaDesign\ImageEditorApi\Model\Service;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 
@@ -21,58 +20,6 @@ class ProjectThumbnailManager
     public function __construct(
         private readonly Filesystem $filesystem
     ) {
-    }
-
-    /**
-     * Generate a blank white PNG image of the specified size and save it.
-     *
-     * @param string $projectUuid
-     * @param int $width
-     * @param int $height
-     * @return string Relative file path
-     * @throws LocalizedException
-     */
-    public function generateBlankThumbnail(string $projectUuid, int $width, int $height): string
-    {
-        $filePath = 'tattva/image-editor/projects/' . $projectUuid . '/thumbnail.png';
-        $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
-
-        // Prevent negative or zero dimensions
-        $width = max(1, $width);
-        $height = max(1, $height);
-
-        // Create GdImage resource
-        $image = @imagecreatetruecolor($width, $height);
-        if ($image === false) {
-            throw new LocalizedException(__('Failed to create image resource for blank canvas.'));
-        }
-
-        $white = imagecolorallocate($image, 255, 255, 255);
-        if ($white === false) {
-            imagedestroy($image);
-            throw new LocalizedException(__('Failed to allocate white color for blank canvas.'));
-        }
-
-        imagefill($image, 0, 0, $white);
-
-        // Capture PNG output in a buffer
-        ob_start();
-        $success = @imagepng($image);
-        $imageData = ob_get_clean();
-        imagedestroy($image);
-
-        if (!$success || $imageData === false) {
-            throw new LocalizedException(__('Failed to generate PNG data for blank canvas.'));
-        }
-
-        try {
-            $mediaDirectory->create(dirname($filePath));
-            $mediaDirectory->writeFile($filePath, $imageData);
-        } catch (\Throwable $exception) {
-            throw new LocalizedException(__('Unable to save the blank canvas thumbnail.'));
-        }
-
-        return $filePath;
     }
 
     /**

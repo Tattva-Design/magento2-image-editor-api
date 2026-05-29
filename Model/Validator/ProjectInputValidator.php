@@ -89,16 +89,16 @@ class ProjectInputValidator
 
     /**
      * @param array<string, mixed> $input
-     * @return array{projectUuid: string, thumbnail: string}
+     * @return array{projectUuid: string, thumbnail: ?string}
      */
     public function validateUpdateThumbnailInput(array $input): array
     {
         $projectUuid = $this->requireNonEmptyString('projectUuid', $input['projectUuid'] ?? '');
-        $thumbnail = $this->requireNonEmptyString('thumbnail', $input['thumbnail'] ?? '');
+        $thumbnail = isset($input['thumbnail']) ? trim((string) $input['thumbnail']) : null;
 
         return [
             'projectUuid' => $projectUuid,
-            'thumbnail' => $thumbnail,
+            'thumbnail' => $thumbnail !== '' ? $thumbnail : null,
         ];
     }
 

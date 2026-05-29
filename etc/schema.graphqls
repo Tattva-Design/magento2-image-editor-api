@@ -74,7 +74,7 @@ input CreateImageEditorProjectImageInput {
 
 input UpdateImageEditorProjectThumbnailInput {
     projectUuid: String! @doc(description: "The project UUID.")
-    thumbnail: String! @doc(description: "The base64-encoded thumbnail image or data URL.")
+    thumbnail: String @doc(description: "The base64-encoded thumbnail image or data URL.")
 }
 
 type ImageEditorProjectListResult {

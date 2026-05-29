@@ -31,10 +31,13 @@ class ProjectThumbnailUpdater
         $validatedInput = $this->projectInputValidator->validateUpdateThumbnailInput($input);
         $projectRow = $this->projectResource->getProjectRowByUuid($customerId, $validatedInput['projectUuid']);
 
-        $thumbnailPath = $this->projectThumbnailManager->saveThumbnailFromBase64(
-            $validatedInput['projectUuid'],
-            $validatedInput['thumbnail']
-        );
+        $thumbnailPath = null;
+        if ($validatedInput['thumbnail'] !== null) {
+            $thumbnailPath = $this->projectThumbnailManager->saveThumbnailFromBase64(
+                $validatedInput['projectUuid'],
+                $validatedInput['thumbnail']
+            );
+        }
 
         try {
             $this->projectResource->getConnection()->update(
