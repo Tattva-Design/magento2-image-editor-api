@@ -23,7 +23,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation CreateImageEditorProject($input: CreateImageEditorProjectInput!) {\n  createImageEditorProject(input: $input) {\n    id\n    uuid\n    customerId\n    storeId\n    name\n    description\n    size\n    width\n    height\n    status\n    canvasObject\n    createdAt\n    updatedAt\n  }\n}",
+            "query": "mutation CreateImageEditorProject($input: CreateImageEditorProjectInput!) {\n  createImageEditorProject(input: $input) {\n    id\n    uuid\n    customerId\n    storeId\n    name\n    description\n    size\n    width\n    height\n    status\n    canvasObject\n    thumbnailUrl\n    createdAt\n    updatedAt\n  }\n}",
             "variables": "{\n  \"input\": {\n    \"name\": \"My Custom Canvas\",\n    \"description\": \"A custom sized project\",\n    \"size\": \"Custom String Size\",\n    \"width\": 1200,\n    \"height\": 800\n  }\n}"
           }
         },
@@ -53,8 +53,38 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation UpdateImageEditorProject($input: UpdateImageEditorProjectInput!) {\n  updateImageEditorProject(input: $input) {\n    id\n    uuid\n    customerId\n    storeId\n    name\n    description\n    size\n    width\n    height\n    status\n    canvasObject\n    createdAt\n    updatedAt\n  }\n}",
+            "query": "mutation UpdateImageEditorProject($input: UpdateImageEditorProjectInput!) {\n  updateImageEditorProject(input: $input) {\n    id\n    uuid\n    customerId\n    storeId\n    name\n    description\n    size\n    width\n    height\n    status\n    canvasObject\n    thumbnailUrl\n    createdAt\n    updatedAt\n  }\n}",
             "variables": "{\n  \"input\": {\n    \"uuid\": \"INSERT_PROJECT_UUID_HERE\",\n    \"name\": \"Updated Canvas Name\",\n    \"description\": \"An updated description\",\n    \"size\": \"Another Custom Size\",\n    \"width\": 1600,\n    \"height\": 1200\n  }\n}"
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}",
+          "host": [
+            "{{base_url}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Project Thumbnail",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customer_token}}"
+          }
+        ],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "mutation UpdateProjectThumbnail($input: UpdateImageEditorProjectThumbnailInput!) {\n  updateImageEditorProjectThumbnail(input: $input) {\n    id\n    uuid\n    customerId\n    storeId\n    name\n    description\n    size\n    width\n    height\n    status\n    canvasObject\n    thumbnailUrl\n    createdAt\n    updatedAt\n  }\n}",
+            "variables": "{\n  \"input\": {\n    \"projectUuid\": \"INSERT_PROJECT_UUID_HERE\",\n    \"thumbnail\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\"\n  }\n}"
           }
         },
         "url": {
@@ -83,7 +113,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "query GetProjects($pageSize: Int, $currentPage: Int) {\n  imageEditorProjects(pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      customerId\n      storeId\n      name\n      description\n      size\n      width\n      height\n      status\n      canvasObject\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
+            "query": "query GetProjects($pageSize: Int, $currentPage: Int) {\n  imageEditorProjects(pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      customerId\n      storeId\n      name\n      description\n      size\n      width\n      height\n      status\n      canvasObject\n      thumbnailUrl\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
             "variables": "{\n  \"pageSize\": 10,\n  \"currentPage\": 1\n}"
           }
         },

@@ -41,6 +41,11 @@ type Mutation {
     ): DeleteImageEditorProjectImageResult!
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\DeleteProjectImage")
     @doc(description: "Deletes an existing project image for the current customer in the current store.")
+    updateImageEditorProjectThumbnail(
+        input: UpdateImageEditorProjectThumbnailInput!
+    ): ImageEditorProject!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\UpdateProjectThumbnail")
+    @doc(description: "Updates only the thumbnail of an existing project for the current customer in the current store.")
 }
 
 input CreateImageEditorProjectInput {
@@ -65,6 +70,11 @@ input CreateImageEditorProjectImageInput {
     projectUuid: String! @doc(description: "The project UUID.")
     originalName: String! @doc(description: "The original uploaded file name.")
     base64Content: String! @doc(description: "The base64-encoded image data.")
+}
+
+input UpdateImageEditorProjectThumbnailInput {
+    projectUuid: String! @doc(description: "The project UUID.")
+    thumbnail: String! @doc(description: "The base64-encoded thumbnail image or data URL.")
 }
 
 type ImageEditorProjectListResult {
@@ -114,6 +124,7 @@ type ImageEditorProject {
     height: Int! @doc(description: "The project height.")
     status: String! @doc(description: "The project status.")
     canvasObject: String @doc(description: "The stored canvas object JSON string.")
+    thumbnailUrl: String @doc(description: "The project's thumbnail image URL.")
     createdAt: String! @doc(description: "The project creation timestamp.")
     updatedAt: String! @doc(description: "The project last update timestamp.")
 }

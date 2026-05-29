@@ -19,7 +19,8 @@ class ProjectCreator
         private readonly StoreManagerInterface $storeManager,
         private readonly UuidGenerator $uuidGenerator,
         private readonly ProjectDataMapper $projectDataMapper,
-        private readonly ProjectResource $projectResource
+        private readonly ProjectResource $projectResource,
+        private readonly ProjectThumbnailManager $projectThumbnailManager
     ) {
     }
 
@@ -42,6 +43,8 @@ class ProjectCreator
 
         $uuid = $this->uuidGenerator->generate();
 
+        $thumbnailPath = $this->projectThumbnailManager->generateBlankThumbnail($uuid, (int) $input['width'], (int) $input['height']);
+
         $data = [
             'uuid' => $uuid,
             'customer_id' => $customerId,
@@ -53,6 +56,7 @@ class ProjectCreator
             'height' => $input['height'],
             'status' => self::DEFAULT_STATUS,
             'canvas_object' => null,
+            'thumbnail' => $thumbnailPath,
         ];
 
         try {
