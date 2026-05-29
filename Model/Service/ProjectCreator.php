@@ -53,6 +53,7 @@ class ProjectCreator
             'height' => $input['height'],
             'status' => self::DEFAULT_STATUS,
             'canvas_object' => null,
+            'thumbnail' => null,
         ];
 
         try {

@@ -4,8 +4,16 @@ declare(strict_types=1);
 
 namespace TattvaDesign\ImageEditorApi\Model\Service;
 
+use Magento\Framework\UrlInterface;
+use Magento\Store\Model\StoreManagerInterface;
+
 class ProjectDataMapper
 {
+    public function __construct(
+        private readonly StoreManagerInterface $storeManager
+    ) {
+    }
+
     /**
      * @return string[]
      */
@@ -23,6 +31,7 @@ class ProjectDataMapper
             'height',
             'status',
             'canvas_object',
+            'thumbnail',
             'created_at',
             'updated_at',
         ];
@@ -46,8 +55,16 @@ class ProjectDataMapper
             'height' => (int) $row['height'],
             'status' => (string) $row['status'],
             'canvasObject' => $row['canvas_object'] !== null ? (string) $row['canvas_object'] : null,
+            'thumbnailUrl' => !empty($row['thumbnail']) ? $this->buildFileUrl((string) $row['thumbnail']) : null,
             'createdAt' => (string) $row['created_at'],
             'updatedAt' => (string) $row['updated_at'],
         ];
+    }
+
+    private function buildFileUrl(string $filePath): string
+    {
+        return rtrim($this->storeManager->getStore()->getBaseUrl(UrlInterface::URL_TYPE_MEDIA), '/')
+            . '/'
+            . ltrim($filePath, '/');
     }
 }
