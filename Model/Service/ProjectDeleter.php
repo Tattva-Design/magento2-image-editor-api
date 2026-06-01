@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace TattvaDesign\ImageEditorApi\Model\Service;
 
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Filesystem;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 
 class ProjectDeleter
 {
-    public function __construct(private readonly ProjectResource $projectResource)
-    {
+    public function __construct(
+        private readonly ProjectResource $projectResource,
+        private readonly Filesystem $filesystem
+    ) {
     }
 
     /**
@@ -25,6 +29,12 @@ class ProjectDeleter
                 $this->projectResource->getTableName(),
                 ['id = ?' => (int) $projectRow['id']]
             );
+
+            $projectDirectoryPath = 'tattva/image-editor/projects/' . $uuid;
+            $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
+            if ($mediaDirectory->isExist($projectDirectoryPath)) {
+                $mediaDirectory->delete($projectDirectoryPath);
+            }
         } catch (LocalizedException $exception) {
             throw new GraphQlInputException($exception->getPhrase());
         } catch (\Throwable $exception) {
