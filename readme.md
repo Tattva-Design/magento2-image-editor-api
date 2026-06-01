@@ -34,4 +34,3 @@ Use the following commands to confirm the package is present and the module is e
 ./bin/root ls -la /var/www/html/app/code/TattvaDesign/ImageEditorApi
 bin/magento module:status TattvaDesign_ImageEditorApi
 ```
-
