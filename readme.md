@@ -34,3 +34,18 @@ Use the following commands to confirm the package is present and the module is e
 ./bin/root ls -la /var/www/html/app/code/TattvaDesign/ImageEditorApi
 bin/magento module:status TattvaDesign_ImageEditorApi
 ```
+
+## Upload the default Image
+
+### Step 1: Put the new images in the folder
+- Drop any new .png, .jpg, .jpeg, .webp, or .gif files into: `Setup/Patch/Data/images/` inside the module. 
+
+### Step 2: Re-run the patch
+- Open your database editor or terminal, and run this SQL query to reset the patch execution record:
+```sql
+    DELETE FROM patch_list WHERE patch_name = 'TattvaDesign\\ImageEditorApi\\Setup\\Patch\\Data\\AddDefaultImages';
+```
+- Sync the module directory to the container and run setup upgrade:
+```bash
+  ./bin/magento setup:upgrade
+```
