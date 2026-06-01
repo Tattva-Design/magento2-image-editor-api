@@ -62,6 +62,7 @@ class ProjectImageDataMapper
             'sizeBytes' => (int) $row['size_bytes'],
             'width' => $row['width'] !== null ? (int) $row['width'] : null,
             'height' => $row['height'] !== null ? (int) $row['height'] : null,
+            'isDefault' => $row['customer_id'] === null,
             'createdAt' => (string) $row['created_at'],
             'updatedAt' => (string) $row['updated_at'],
         ];

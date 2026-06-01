@@ -156,6 +156,7 @@ type ImageEditorProjectImage {
     sizeBytes: Int! @doc(description: "The image file size in bytes.")
     width: Int @doc(description: "The image width in pixels.")
     height: Int @doc(description: "The image height in pixels.")
+    isDefault: Boolean! @doc(description: "Whether the image is a global default system image.")
     createdAt: String! @doc(description: "The image creation timestamp.")
     updatedAt: String! @doc(description: "The image last update timestamp.")
 }

@@ -131,12 +131,21 @@ class ProjectImageResource
         array $sort
     ): array {
         $connection = $this->getConnection();
+        
+        $whereClause = '(project_id = :project_id AND customer_id = :customer_id AND store_id = :store_id) '
+            . 'OR (project_id IS NULL AND customer_id IS NULL)';
+        
+        $binds = [
+            'project_id' => $projectId,
+            'customer_id' => $customerId,
+            'store_id' => $storeId
+        ];
+
         $totalCount = (int) $connection->fetchOne(
             $connection->select()
                 ->from($this->getTableName(), [new \Zend_Db_Expr('COUNT(*)')])
-                ->where('project_id = ?', $projectId)
-                ->where('customer_id = ?', $customerId)
-                ->where('store_id = ?', $storeId)
+                ->where($whereClause),
+            $binds
         );
 
         $totalPages = $pageSize > 0 ? (int) ceil($totalCount / $pageSize) : 0;
@@ -153,12 +162,12 @@ class ProjectImageResource
         $rows = $connection->fetchAll(
             $connection->select()
                 ->from($this->getTableName(), $this->projectImageDataMapper->getSelectColumns())
-                ->where('project_id = ?', $projectId)
-                ->where('customer_id = ?', $customerId)
-                ->where('store_id = ?', $storeId)
+                ->where($whereClause)
+                ->order(new \Zend_Db_Expr('CASE WHEN project_id IS NULL THEN 0 ELSE 1 END ASC'))
                 ->order($sortColumn . ' ' . $sortDirection)
                 ->order('id ' . ($sortColumn === 'created_at' ? $sortDirection : Select::SQL_DESC))
-                ->limit($pageSize, $offset)
+                ->limit($pageSize, $offset),
+            $binds
         );
 
         return [
