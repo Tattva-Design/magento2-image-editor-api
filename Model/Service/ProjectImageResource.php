@@ -132,8 +132,7 @@ class ProjectImageResource
     ): array {
         $connection = $this->getConnection();
         
-        $whereClause = '(project_id = :project_id AND customer_id = :customer_id AND store_id = :store_id) '
-            . 'OR (project_id IS NULL AND customer_id IS NULL)';
+        $whereClause = 'project_id = :project_id AND customer_id = :customer_id AND store_id = :store_id';
         
         $binds = [
             'project_id' => $projectId,
@@ -163,11 +162,56 @@ class ProjectImageResource
             $connection->select()
                 ->from($this->getTableName(), $this->projectImageDataMapper->getSelectColumns())
                 ->where($whereClause)
-                ->order(new \Zend_Db_Expr('CASE WHEN project_id IS NULL THEN 0 ELSE 1 END ASC'))
                 ->order($sortColumn . ' ' . $sortDirection)
                 ->order('id ' . ($sortColumn === 'created_at' ? $sortDirection : Select::SQL_DESC))
                 ->limit($pageSize, $offset),
             $binds
+        );
+
+        return [
+            'totalCount' => $totalCount,
+            'items' => array_map([$this->projectImageDataMapper, 'mapRow'], $rows),
+            'pageInfo' => [
+                'pageSize' => $pageSize,
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'hasNextPage' => $currentPage < $totalPages,
+                'hasPreviousPage' => $currentPage > 1 && $totalCount > 0,
+            ],
+        ];
+    }
+
+    /**
+     * @return array{totalCount: int, items: array<int, array<string, mixed>>, pageInfo: array<string, mixed>}
+     */
+    public function getDefaultImageList(
+        int $currentPage,
+        int $pageSize
+    ): array {
+        $connection = $this->getConnection();
+        $whereClause = 'project_id IS NULL AND customer_id IS NULL';
+
+        $totalCount = (int) $connection->fetchOne(
+            $connection->select()
+                ->from($this->getTableName(), [new \Zend_Db_Expr('COUNT(*)')])
+                ->where($whereClause)
+        );
+
+        $totalPages = $pageSize > 0 ? (int) ceil($totalCount / $pageSize) : 0;
+        if ($totalCount > 0 && $currentPage > $totalPages) {
+            throw new GraphQlInputException(
+                __('The "currentPage" value %1 is greater than the available pages %2.', $currentPage, $totalPages)
+            );
+        }
+
+        $offset = ($currentPage - 1) * $pageSize;
+
+        $rows = $connection->fetchAll(
+            $connection->select()
+                ->from($this->getTableName(), $this->projectImageDataMapper->getSelectColumns())
+                ->where($whereClause)
+                ->order('id ASC')
+                ->limit($pageSize, $offset)
         );
 
         return [
