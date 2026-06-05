@@ -187,6 +187,36 @@
       "response": []
     },
     {
+      "name": "Get Default Images",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customer_token}}"
+          }
+        ],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query GetDefaultImages($pageSize: Int, $currentPage: Int) {\n  imageEditorDefaultImages(pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      type\n      status\n      fileName\n      originalName\n      filePath\n      fileUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
+            "variables": "{\n  \"pageSize\": 10,\n  \"currentPage\": 1\n}"
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}",
+          "host": [
+            "{{base_url}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Delete Project Image",
       "request": {
         "method": "POST",

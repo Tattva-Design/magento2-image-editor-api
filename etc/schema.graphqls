@@ -13,6 +13,12 @@ type Query {
     ): ImageEditorProjectImageListResult!
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\ProjectImages")
     @doc(description: "Returns the current customer's project images for the current store.")
+    imageEditorDefaultImages(
+        pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
+        currentPage: Int = 1 @doc(description: "The current results page, starting from 1.")
+    ): ImageEditorProjectImageListResult!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\DefaultImages")
+    @doc(description: "Returns the global default system images.")
 }
 
 type Mutation {
