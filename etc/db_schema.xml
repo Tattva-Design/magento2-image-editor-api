@@ -49,6 +49,7 @@
         <column xsi:type="varchar" name="file_name" nullable="false" length="255" comment="Stored File Name"/>
         <column xsi:type="varchar" name="original_name" nullable="false" length="255" comment="Original File Name"/>
         <column xsi:type="text" name="file_path" nullable="false" comment="Relative File Path"/>
+        <column xsi:type="text" name="thumbnail_path" nullable="true" comment="Thumbnail File Path"/>
         <column xsi:type="varchar" name="mime_type" nullable="false" length="100" comment="Mime Type"/>
         <column xsi:type="varchar" name="extension" nullable="false" length="20" comment="File Extension"/>
         <column xsi:type="bigint" name="size_bytes" padding="20" unsigned="true" nullable="false" identity="false" comment="File Size Bytes"/>

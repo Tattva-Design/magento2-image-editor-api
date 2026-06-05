@@ -72,13 +72,36 @@ class ProjectImageUploader
 
         $fileName = $this->buildStoredFileName($imageUuid, $originalName);
         $filePath = 'tattva/image-editor/projects/' . $input['projectUuid'] . '/images/' . $fileName;
+
+        $thumbnailFileName = $this->buildThumbnailFileName($imageUuid, $originalName, $imageMetadata['extension']);
+        $thumbnailFilePath = 'tattva/image-editor/projects/' . $input['projectUuid'] . '/images/' . $thumbnailFileName;
+
         $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
 
         try {
             $mediaDirectory->create(dirname($filePath));
+            
+            // Save original image
             $mediaDirectory->writeFile($filePath, $input['binaryContent']);
-            $this->projectImageResource->updateImageStorageData($imageId, $fileName, $filePath);
+
+            // Generate and save thumbnail
+            $thumbnailContent = $this->resizeImage(
+                $input['binaryContent'],
+                $imageMetadata['mimeType'],
+                600
+            );
+            $mediaDirectory->writeFile($thumbnailFilePath, $thumbnailContent);
+
+            $this->projectImageResource->updateImageStorageData($imageId, $fileName, $filePath, $thumbnailFilePath);
         } catch (\Throwable $exception) {
+            if (isset($mediaDirectory)) {
+                if ($mediaDirectory->isExist($filePath)) {
+                    $mediaDirectory->delete($filePath);
+                }
+                if ($mediaDirectory->isExist($thumbnailFilePath)) {
+                    $mediaDirectory->delete($thumbnailFilePath);
+                }
+            }
             $this->projectImageResource->deleteImageById($imageId);
             throw new GraphQlInputException(__('Unable to upload the project image at this time.'));
         }
@@ -154,5 +177,82 @@ class ProjectImageUploader
         }
 
         return $normalizedBaseName;
+    }
+
+    /**
+     * Resize image content using PHP GD library to a maximum dimension
+     *
+     * @param string $binaryContent
+     * @param string $mimeType
+     * @param int $maxDimension
+     * @return string Resized binary content
+     */
+    private function resizeImage(string $binaryContent, string $mimeType, int $maxDimension = 600): string
+    {
+        $srcImage = @imagecreatefromstring($binaryContent);
+        if (!$srcImage) {
+            return $binaryContent; // Fallback to original content if GD fails to load
+        }
+
+        $width = imagesx($srcImage);
+        $height = imagesy($srcImage);
+
+        if ($width <= $maxDimension && $height <= $maxDimension) {
+            imagedestroy($srcImage);
+            return $binaryContent; // No resizing needed, return original
+        }
+
+        $ratio = min($maxDimension / $width, $maxDimension / $height);
+        $newWidth = (int) round($width * $ratio);
+        $newHeight = (int) round($height * $ratio);
+
+        $dstImage = imagecreatetruecolor($newWidth, $newHeight);
+        if (!$dstImage) {
+            imagedestroy($srcImage);
+            return $binaryContent;
+        }
+
+        // Preserve transparency for PNG, WebP and GIF
+        if ($mimeType === 'image/png' || $mimeType === 'image/webp' || $mimeType === 'image/gif') {
+            imagealphablending($dstImage, false);
+            imagesavealpha($dstImage, true);
+            $transparent = imagecolorallocatealpha($dstImage, 255, 255, 255, 127);
+            if ($transparent !== false) {
+                imagefilledrectangle($dstImage, 0, 0, $newWidth, $newHeight, $transparent);
+            }
+        }
+
+        imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        ob_start();
+        switch ($mimeType) {
+            case 'image/jpeg':
+                imagejpeg($dstImage, null, 90);
+                break;
+            case 'image/png':
+                imagepng($dstImage, null, 9);
+                break;
+            case 'image/webp':
+                imagewebp($dstImage, null, 90);
+                break;
+            case 'image/gif':
+                imagegif($dstImage);
+                break;
+            default:
+                imagejpeg($dstImage, null, 90);
+                break;
+        }
+        $resizedContent = ob_get_clean();
+
+        imagedestroy($srcImage);
+        imagedestroy($dstImage);
+
+        return $resizedContent ?: $binaryContent;
+    }
+
+    private function buildThumbnailFileName(string $imageUuid, string $originalName, string $extension): string
+    {
+        $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+        return substr($imageUuid, 0, 8) . '-' . $baseName . '-thumbnail.' . strtolower($extension);
     }
 }

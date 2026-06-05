@@ -33,10 +33,17 @@ class ProjectImageDeleter
             $this->projectImageResource->deleteImageById((int) $imageRow['id']);
 
             $filePath = (string) $imageRow['file_path'];
-            if ($filePath !== '') {
+            $thumbnailPath = (string) ($imageRow['thumbnail_path'] ?? '');
+
+            if ($filePath !== '' || $thumbnailPath !== '') {
                 $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
-                if ($mediaDirectory->isExist($filePath)) {
+
+                if ($filePath !== '' && $mediaDirectory->isExist($filePath)) {
                     $mediaDirectory->delete($filePath);
+                }
+
+                if ($thumbnailPath !== '' && $mediaDirectory->isExist($thumbnailPath)) {
+                    $mediaDirectory->delete($thumbnailPath);
                 }
             }
         } catch (LocalizedException $exception) {

@@ -101,14 +101,23 @@ class ProjectImageResource
         return (int) $connection->lastInsertId($tableName);
     }
 
-    public function updateImageStorageData(int $imageId, string $fileName, string $filePath): void
-    {
+    public function updateImageStorageData(
+        int $imageId,
+        string $fileName,
+        string $filePath,
+        ?string $thumbnailPath = null
+    ): void {
+        $data = [
+            'file_name' => $fileName,
+            'file_path' => $filePath,
+        ];
+        if ($thumbnailPath !== null) {
+            $data['thumbnail_path'] = $thumbnailPath;
+        }
+
         $this->getConnection()->update(
             $this->getTableName(),
-            [
-                'file_name' => $fileName,
-                'file_path' => $filePath,
-            ],
+            $data,
             ['id = ?' => $imageId]
         );
     }
