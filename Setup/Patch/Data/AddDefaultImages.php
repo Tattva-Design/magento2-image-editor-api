@@ -99,7 +99,6 @@ class AddDefaultImages implements DataPatchInterface
                 'project_id' => null,
                 'customer_id' => null,
                 'store_id' => null,
-                'type' => 'original',
                 'status' => 'ready',
                 'file_name' => $targetFileName,
                 'original_name' => $formattedIndex,

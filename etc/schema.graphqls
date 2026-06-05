@@ -151,7 +151,6 @@ type ImageEditorProjectImage {
     projectId: Int! @doc(description: "The owning project ID.")
     customerId: Int! @doc(description: "The owning customer ID.")
     storeId: Int! @doc(description: "The owning store ID.")
-    type: String! @doc(description: "The image type.")
     status: String! @doc(description: "The image status.")
     fileName: String! @doc(description: "The stored file name.")
     originalName: String! @doc(description: "The original uploaded file name.")
