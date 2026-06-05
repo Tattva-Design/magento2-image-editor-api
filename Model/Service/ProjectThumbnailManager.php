@@ -76,6 +76,12 @@ class ProjectThumbnailManager
             throw new GraphQlInputException(__('Unable to save the project thumbnail at this time.'));
         }
 
-        return $filePath;
+        $chars = 'abcdefghijklmnopqrstuvwxyz';
+        $randomQuery = '';
+        for ($i = 0; $i < 4; $i++) {
+            $randomQuery .= $chars[random_int(0, 25)];
+        }
+
+        return $filePath . '?' . $randomQuery;
     }
 }
