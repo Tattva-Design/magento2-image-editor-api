@@ -156,6 +156,7 @@ type ImageEditorProjectImage {
     originalName: String! @doc(description: "The original uploaded file name.")
     filePath: String! @doc(description: "The relative media path.")
     fileUrl: String! @doc(description: "The browser-accessible media URL.")
+    thumbnailUrl: String @doc(description: "The thumbnail URL of the uploaded image.")
     mimeType: String! @doc(description: "The detected mime type.")
     extension: String! @doc(description: "The stored file extension.")
     sizeBytes: Int! @doc(description: "The image file size in bytes.")
