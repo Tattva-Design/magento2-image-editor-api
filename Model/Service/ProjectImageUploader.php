@@ -12,7 +12,6 @@ use TattvaDesign\ImageEditorApi\Model\Util\UuidGenerator;
 
 class ProjectImageUploader
 {
-    private const IMAGE_TYPE = 'original';
     private const IMAGE_STATUS = 'ready';
 
     /**
@@ -55,7 +54,6 @@ class ProjectImageUploader
                 'project_id' => $projectId,
                 'customer_id' => (int) $projectRow['customer_id'],
                 'store_id' => (int) $projectRow['store_id'],
-                'type' => self::IMAGE_TYPE,
                 'status' => self::IMAGE_STATUS,
                 'file_name' => $temporaryFileName,
                 'original_name' => $originalName,

@@ -143,7 +143,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\n  createImageEditorProjectImage(input: $input) {\n    id\n    uuid\n    projectId\n    customerId\n    storeId\n    type\n    status\n    fileName\n    originalName\n    filePath\n    fileUrl\n    mimeType\n    extension\n    sizeBytes\n    width\n    height\n    createdAt\n    updatedAt\n  }\n}",
+            "query": "mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\n  createImageEditorProjectImage(input: $input) {\n    id\n    uuid\n    projectId\n    customerId\n    storeId\n    status\n    fileName\n    originalName\n    filePath\n    fileUrl\n    mimeType\n    extension\n    sizeBytes\n    width\n    height\n    createdAt\n    updatedAt\n  }\n}",
             "variables": "{\n  \"input\": {\n    \"projectUuid\": \"INSERT_PROJECT_UUID_HERE\",\n    \"originalName\": \"pixel.png\",\n    \"base64Content\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\"\n  }\n}"
           }
         },
@@ -173,7 +173,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "query GetProjectImages($projectUuid: String!, $pageSize: Int, $currentPage: Int) {\n  imageEditorProjectImages(projectUuid: $projectUuid, pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      type\n      status\n      fileName\n      originalName\n      filePath\n      fileUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
+            "query": "query GetProjectImages($projectUuid: String!, $pageSize: Int, $currentPage: Int) {\n  imageEditorProjectImages(projectUuid: $projectUuid, pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      status\n      fileName\n      originalName\n      filePath\n      fileUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
             "variables": "{\n  \"projectUuid\": \"INSERT_PROJECT_UUID_HERE\",\n  \"pageSize\": 10,\n  \"currentPage\": 1\n}"
           }
         },
@@ -203,7 +203,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "query GetDefaultImages($pageSize: Int, $currentPage: Int) {\n  imageEditorDefaultImages(pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      type\n      status\n      fileName\n      originalName\n      filePath\n      fileUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
+            "query": "query GetDefaultImages($pageSize: Int, $currentPage: Int) {\n  imageEditorDefaultImages(pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      status\n      fileName\n      originalName\n      filePath\n      fileUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
             "variables": "{\n  \"pageSize\": 10,\n  \"currentPage\": 1\n}"
           }
         },

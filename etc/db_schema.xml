@@ -45,7 +45,6 @@
         <column xsi:type="int" name="project_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Project ID"/>
         <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer ID"/>
         <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="true" identity="false" comment="Store ID"/>
-        <column xsi:type="varchar" name="type" nullable="false" length="32" comment="Image Type"/>
         <column xsi:type="varchar" name="status" nullable="false" length="32" comment="Image Status"/>
         <column xsi:type="varchar" name="file_name" nullable="false" length="255" comment="Stored File Name"/>
         <column xsi:type="varchar" name="original_name" nullable="false" length="255" comment="Original File Name"/>
