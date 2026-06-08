@@ -74,8 +74,6 @@ input UpdateImageEditorProjectInput {
 
 input CreateImageEditorProjectImageInput {
     projectUuid: String! @doc(description: "The project UUID.")
-    originalName: String! @doc(description: "The original uploaded file name.")
-    base64Content: String! @doc(description: "The base64-encoded image data.")
 }
 
 input UpdateImageEditorProjectThumbnailInput {

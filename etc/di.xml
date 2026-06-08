@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\GraphQl\Controller\GraphQl">
+        <plugin name="tattva_design_image_editor_graphql_multipart"
+                type="TattvaDesign\ImageEditorApi\Plugin\GraphQlMultipartPlugin"
+                sortOrder="10"/>
+    </type>
+    <type name="Magento\GraphQl\Controller\HttpRequestValidator\ContentTypeValidator">
+        <plugin name="tattva_design_image_editor_graphql_content_type"
+                type="TattvaDesign\ImageEditorApi\Plugin\ContentTypeValidatorPlugin"
+                sortOrder="10"/>
+    </type>
+</config>
