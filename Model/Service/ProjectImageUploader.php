@@ -9,6 +9,7 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use TattvaDesign\ImageEditorApi\Model\Util\UuidGenerator;
+use TattvaDesign\ImageEditorApi\Model\Constants;
 
 class ProjectImageUploader
 {
@@ -46,7 +47,7 @@ class ProjectImageUploader
         $imageUuid = $this->uuidGenerator->generate();
         $originalName = $this->buildDisplayOriginalName($projectId, $input['originalName'], $imageMetadata['extension']);
         $temporaryFileName = $imageUuid . '.' . strtolower($imageMetadata['extension']);
-        $temporaryFilePath = 'tattva/image-editor/projects/' . $input['projectUuid'] . '/images/' . $temporaryFileName;
+        $temporaryFilePath = Constants::PROJECTS_PATH . $input['projectUuid'] . '/images/' . $temporaryFileName;
 
         try {
             $imageId = $this->projectImageResource->insertImage([
@@ -71,10 +72,10 @@ class ProjectImageUploader
         }
 
         $fileName = $this->buildStoredFileName($imageUuid, $originalName);
-        $filePath = 'tattva/image-editor/projects/' . $input['projectUuid'] . '/images/' . $fileName;
+        $filePath = Constants::PROJECTS_PATH . $input['projectUuid'] . '/images/' . $fileName;
 
         $thumbnailFileName = $this->buildThumbnailFileName($imageUuid, $originalName, $imageMetadata['extension']);
-        $thumbnailFilePath = 'tattva/image-editor/projects/' . $input['projectUuid'] . '/images/' . $thumbnailFileName;
+        $thumbnailFilePath = Constants::PROJECTS_PATH . $input['projectUuid'] . '/images/' . $thumbnailFileName;
 
         $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
 

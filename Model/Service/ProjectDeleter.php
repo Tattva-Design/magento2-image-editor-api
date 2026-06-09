@@ -8,6 +8,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Filesystem;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use TattvaDesign\ImageEditorApi\Model\Constants;
 
 class ProjectDeleter
 {
@@ -30,7 +31,7 @@ class ProjectDeleter
                 ['id = ?' => (int) $projectRow['id']]
             );
 
-            $projectDirectoryPath = 'tattva/image-editor/projects/' . $uuid;
+            $projectDirectoryPath = Constants::PROJECTS_PATH . $uuid;
             $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
             if ($mediaDirectory->isExist($projectDirectoryPath)) {
                 $mediaDirectory->delete($projectDirectoryPath);
