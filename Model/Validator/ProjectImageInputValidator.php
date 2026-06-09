@@ -14,29 +14,23 @@ class ProjectImageInputValidator
      */
     public function validateCreateInput(array $input): array
     {
-        $projectUuid = $this->requireNonEmptyString('projectUuid', $input['projectUuid'] ?? null);
-        $originalName = $this->requireNonEmptyString('originalName', $input['originalName'] ?? null);
-        $base64Content = trim((string) ($input['base64Content'] ?? ''));
+        $projectUuid = $input['projectUuid'] ?? null;
+        $file = $input['file'] ?? null;
 
-        if ($base64Content === '') {
-            throw new GraphQlInputException(__('The "base64Content" value must be a non-empty string.'));
+        if (!is_array($file) || !isset($file['tmp_name']) || (int) ($file['size'] ?? 0) <= 0) {
+            throw new GraphQlInputException(__('The "file" value must be a valid uploaded file.'));
         }
 
-        if (str_contains($base64Content, ',')) {
-            $parts = explode(',', $base64Content, 2);
-            $base64Content = $parts[1];
-        }
-
-        $binaryContent = base64_decode($base64Content, true);
+        $binaryContent = @file_get_contents((string) $file['tmp_name']);
         if ($binaryContent === false || $binaryContent === '') {
-            throw new GraphQlInputException(__('The "base64Content" value must be valid base64 image data.'));
+            throw new GraphQlInputException(__('The uploaded file could not be read.'));
         }
 
-        return [
-            'projectUuid' => $projectUuid,
-            'originalName' => $originalName,
-            'binaryContent' => $binaryContent,
-        ];
+        return $this->validateBinaryInput(
+            $projectUuid,
+            $file['name'] ?? '',
+            $binaryContent
+        );
     }
 
     /**

@@ -1,1 +1,5 @@
 - Need check the auto update the tag when PR is merged, and update the tag when PR is merged.
+- Need create constant file for static path `tattva/image-editor/projects/`
+- image should store in project folder only
+- If same name image has uploaded than it should add 01 in the end, same goes for thumbnail
+- need to check for previous upload image code and delete it

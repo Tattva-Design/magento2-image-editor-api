@@ -141,11 +141,24 @@
           }
         ],
         "body": {
-          "mode": "graphql",
-          "graphql": {
-            "query": "mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\n  createImageEditorProjectImage(input: $input) {\n    id\n    uuid\n    projectId\n    customerId\n    storeId\n    status\n    fileName\n    originalName\n    filePath\n    fileUrl\n    thumbnailUrl\n    mimeType\n    extension\n    sizeBytes\n    width\n    height\n    createdAt\n    updatedAt\n  }\n}",
-            "variables": "{\n  \"input\": {\n    \"projectUuid\": \"INSERT_PROJECT_UUID_HERE\",\n    \"originalName\": \"pixel.png\",\n    \"base64Content\": \"iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\"\n  }\n}"
-          }
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "operations",
+              "value": "{\"query\":\"mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\\n  createImageEditorProjectImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    fileUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"projectUuid\":\"INSERT_PROJECT_UUID_HERE\",\"file\":null}}}",
+              "type": "text"
+            },
+            {
+              "key": "map",
+              "value": "{\"image\":[\"variables.input.file\"]}",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": []
+            }
+          ]
         },
         "url": {
           "raw": "{{base_url}}",
