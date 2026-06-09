@@ -7,6 +7,7 @@ namespace TattvaDesign\ImageEditorApi\Model\Service;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use TattvaDesign\ImageEditorApi\Model\Constants;
 
 class ProjectThumbnailManager
 {
@@ -66,7 +67,7 @@ class ProjectThumbnailManager
         $extension = self::MIME_EXTENSION_MAP[$mimeType];
 
         $fileName = 'thumbnail.' . $extension;
-        $filePath = 'tattva/image-editor/projects/' . $projectUuid . '/' . $fileName;
+        $filePath = Constants::PROJECTS_PATH . $projectUuid . '/' . $fileName;
         $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
 
         try {
