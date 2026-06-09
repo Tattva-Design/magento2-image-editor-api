@@ -67,15 +67,19 @@ class ProjectInputValidator
             if ($canvasObject === null) {
                 $updateData['canvas_object'] = null;
             } else {
-                $canvasObjectString = trim((string) $canvasObject);
-                if ($canvasObjectString === '') {
-                    $updateData['canvas_object'] = null;
+                if (is_array($canvasObject) || is_object($canvasObject)) {
+                    $updateData['canvas_object'] = json_encode($canvasObject);
                 } else {
-                    json_decode($canvasObjectString, true);
-                    if (json_last_error() !== JSON_ERROR_NONE) {
-                        throw new GraphQlInputException(__('The "canvasObject" value must be valid JSON.'));
+                    $canvasObjectString = trim((string) $canvasObject);
+                    if ($canvasObjectString === '') {
+                        $updateData['canvas_object'] = null;
+                    } else {
+                        json_decode($canvasObjectString, true);
+                        if (json_last_error() !== JSON_ERROR_NONE) {
+                            throw new GraphQlInputException(__('The "canvasObject" value must be valid JSON.'));
+                        }
+                        $updateData['canvas_object'] = $canvasObjectString;
                     }
-                    $updateData['canvas_object'] = $canvasObjectString;
                 }
             }
         }

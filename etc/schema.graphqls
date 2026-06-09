@@ -1,3 +1,5 @@
+scalar Json @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl\\Type\\Scalar\\JsonScalar")
+
 type Query {
     imageEditorProjects(
         pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
@@ -69,7 +71,7 @@ input UpdateImageEditorProjectInput {
     size: String @doc(description: "The project size.")
     width: Int @doc(description: "The optional project width.")
     height: Int @doc(description: "The optional project height.")
-    canvasObject: String @doc(description: "The canvas object JSON string.")
+    canvasObject: Json @doc(description: "The canvas object JSON structure.")
 }
 
 scalar Upload @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl\\UploadType") @doc(description: "The Upload scalar type represents file uploads.")
@@ -130,7 +132,7 @@ type ImageEditorProject {
     width: Int! @doc(description: "The project width.")
     height: Int! @doc(description: "The project height.")
     status: String! @doc(description: "The project status.")
-    canvasObject: String @doc(description: "The stored canvas object JSON string.")
+    canvasObject: Json @doc(description: "The stored canvas object JSON structure.")
     thumbnailUrl: String @doc(description: "The project's thumbnail image URL.")
     createdAt: String! @doc(description: "The project creation timestamp.")
     updatedAt: String! @doc(description: "The project last update timestamp.")
