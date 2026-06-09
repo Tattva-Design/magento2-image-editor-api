@@ -72,8 +72,11 @@ input UpdateImageEditorProjectInput {
     canvasObject: String @doc(description: "The canvas object JSON string.")
 }
 
+scalar Upload @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl\\UploadType") @doc(description: "The Upload scalar type represents file uploads.")
+
 input CreateImageEditorProjectImageInput {
     projectUuid: String! @doc(description: "The project UUID.")
+    file: Upload! @doc(description: "The uploaded file.")
 }
 
 input UpdateImageEditorProjectThumbnailInput {

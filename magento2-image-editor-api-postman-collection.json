@@ -132,6 +132,10 @@
         "method": "POST",
         "header": [
           {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
             "key": "Authorization",
             "value": "Bearer {{customer_token}}"
           }
@@ -141,7 +145,12 @@
           "formdata": [
             {
               "key": "operations",
-              "value": "{\"query\":\"mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\\n  createImageEditorProjectImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    fileUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"projectUuid\":\"INSERT_PROJECT_UUID_HERE\"}}}",
+              "value": "{\"query\":\"mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\\n  createImageEditorProjectImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    fileUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"projectUuid\":\"INSERT_PROJECT_UUID_HERE\",\"file\":null}}}",
+              "type": "text"
+            },
+            {
+              "key": "map",
+              "value": "{\"image\":[\"variables.input.file\"]}",
               "type": "text"
             },
             {
