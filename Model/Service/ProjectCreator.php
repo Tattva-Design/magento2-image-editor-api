@@ -52,6 +52,7 @@ class ProjectCreator
             'width' => $input['width'],
             'height' => $input['height'],
             'status' => self::DEFAULT_STATUS,
+            'product_sku' => $input['product_sku'] ?? null,
             'canvas_object' => null,
             'thumbnail' => null,
         ];

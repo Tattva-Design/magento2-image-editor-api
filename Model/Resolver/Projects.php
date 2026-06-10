@@ -36,6 +36,7 @@ class Projects implements ResolverInterface
 
         $currentPage = (int) ($args['currentPage'] ?? 1);
         $pageSize = (int) ($args['pageSize'] ?? self::DEFAULT_PAGE_SIZE);
+        $status = isset($args['status']) ? trim((string) $args['status']) : 'active';
 
         if ($currentPage < 1) {
             throw new GraphQlInputException(__('The "currentPage" value must be greater than 0.'));
@@ -47,6 +48,6 @@ class Projects implements ResolverInterface
             );
         }
 
-        return $this->projectListProvider->getList($customerId, $currentPage, $pageSize);
+        return $this->projectListProvider->getList($customerId, $currentPage, $pageSize, $status);
     }
 }

@@ -19,6 +19,7 @@ class ProjectInputValidator
         $description = isset($input['description']) ? trim((string) $input['description']) : null;
         $width = $this->validateDimension('width', $input['width']);
         $height = $this->validateDimension('height', $input['height']);
+        $productSku = isset($input['productSku']) ? trim((string) $input['productSku']) : null;
 
         return [
             'name' => $name,
@@ -26,6 +27,7 @@ class ProjectInputValidator
             'size' => $size,
             'width' => $width,
             'height' => $height,
+            'product_sku' => $productSku !== '' ? $productSku : null,
         ];
     }
 
@@ -81,6 +83,19 @@ class ProjectInputValidator
                         $updateData['canvas_object'] = $canvasObjectString;
                     }
                 }
+            }
+        }
+
+        if (array_key_exists('status', $input)) {
+            $updateData['status'] = $this->requireNonEmptyString('status', $input['status']);
+        }
+
+        if (array_key_exists('productSku', $input)) {
+            $productSku = $input['productSku'];
+            if ($productSku === null) {
+                $updateData['product_sku'] = null;
+            } else {
+                $updateData['product_sku'] = trim((string) $productSku);
             }
         }
 
