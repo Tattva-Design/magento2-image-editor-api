@@ -2,11 +2,17 @@ scalar Json @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl
 
 type Query {
     imageEditorProjects(
+        status: String = "active" @doc(description: "Filter projects by status (defaults to active).")
         pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
         currentPage: Int = 1 @doc(description: "The current results page, starting from 1.")
     ): ImageEditorProjectListResult!
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\Projects")
     @doc(description: "Returns the current customer's image editor projects ordered by newest created first.")
+    imageEditorProjectByUuid(
+        uuid: String! @doc(description: "The project UUID.")
+    ): ImageEditorProject!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\ProjectByUuid")
+    @doc(description: "Returns a single project by its UUID for the current customer.")
     imageEditorProjectImages(
         projectUuid: String! @doc(description: "The project UUID.")
         pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
@@ -73,6 +79,7 @@ input CreateImageEditorProjectInput {
     size: String! @doc(description: "The project size.")
     width: Int! @doc(description: "The project width.")
     height: Int! @doc(description: "The project height.")
+    productSku: String @doc(description: "The associated product SKU.")
 }
 
 input UpdateImageEditorProjectInput {
@@ -83,6 +90,8 @@ input UpdateImageEditorProjectInput {
     width: Int @doc(description: "The optional project width.")
     height: Int @doc(description: "The optional project height.")
     canvasObject: Json @doc(description: "The canvas object JSON structure.")
+    status: String @doc(description: "The project status.")
+    productSku: String @doc(description: "The associated product SKU.")
 }
 
 scalar Upload @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl\\UploadType") @doc(description: "The Upload scalar type represents file uploads.")
@@ -148,6 +157,7 @@ type ImageEditorProject {
     width: Int! @doc(description: "The project width.")
     height: Int! @doc(description: "The project height.")
     status: String! @doc(description: "The project status.")
+    productSku: String @doc(description: "The associated product SKU.")
     canvasObject: Json @doc(description: "The stored canvas object JSON structure.")
     thumbnailUrl: String @doc(description: "The project's thumbnail image URL.")
     createdAt: String! @doc(description: "The project creation timestamp.")
@@ -185,4 +195,8 @@ type ImageEditorProjectImage {
     isDefault: Boolean! @doc(description: "Whether the image is a global default system image.")
     createdAt: String! @doc(description: "The image creation timestamp.")
     updatedAt: String! @doc(description: "The image last update timestamp.")
+}
+
+input CartItemInput {
+    project_uuid: String @doc(description: "The UUID of the image editor project associated with this cart item.")
 }

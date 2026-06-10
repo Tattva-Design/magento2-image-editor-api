@@ -11,4 +11,22 @@
                 type="TattvaDesign\ImageEditorApi\Plugin\ContentTypeValidatorPlugin"
                 sortOrder="10"/>
     </type>
+
+    <type name="Magento\QuoteGraphQl\Model\Resolver\AddProductsToCart">
+        <plugin name="tattva_design_image_editor_add_products_to_cart_plugin"
+                type="TattvaDesign\ImageEditorApi\Plugin\AddProductsToCartPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\QuoteGraphQl\Model\Cart\BuyRequest\BuyRequestBuilder">
+        <plugin name="tattva_design_image_editor_buy_request_builder_plugin"
+                type="TattvaDesign\ImageEditorApi\Plugin\BuyRequestBuilderPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Quote\Model\Quote\Item">
+        <plugin name="tattva_design_image_editor_quote_item_represent_product_plugin"
+                type="TattvaDesign\ImageEditorApi\Plugin\QuoteItemPlugin"
+                sortOrder="10"/>
+    </type>
 </config>
