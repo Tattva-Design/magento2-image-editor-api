@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:DataObject/etc/fieldset.xsd">
+    <fieldset id="sales_convert_quote_item">
+        <field name="project_uuid">
+            <aspect name="to_order_item" />
+        </field>
+    </fieldset>
+</config>
