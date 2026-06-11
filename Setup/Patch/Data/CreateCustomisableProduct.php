@@ -53,6 +53,10 @@ class CreateCustomisableProduct implements DataPatchInterface
 
         try {
             $product = $this->productRepository->get(self::SKU);
+            if ($product->getWeight() != 0.5) {
+                $product->setWeight(0.5);
+                $this->productRepository->save($product);
+            }
             $productId = (int)$product->getId();
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             // Create product
@@ -62,6 +66,7 @@ class CreateCustomisableProduct implements DataPatchInterface
                 ->setName('Customisable Product')
                 ->setAttributeSetId($product->getDefaultAttributeSetId())
                 ->setPrice(500.00)
+                ->setWeight(0.5)
                 ->setStatus(Status::STATUS_ENABLED)
                 ->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE); // Hidden from catalog search
 
@@ -104,22 +109,13 @@ class CreateCustomisableProduct implements DataPatchInterface
         // 3. Populate MSI inventory_source_item table if MSI is enabled
         $inventorySourceItemTable = $this->moduleDataSetup->getTable('inventory_source_item');
         if ($connection->isTableExists($inventorySourceItemTable)) {
-            // Fetch all active inventory sources
-            $inventorySourceTable = $this->moduleDataSetup->getTable('inventory_source');
-            if ($connection->isTableExists($inventorySourceTable)) {
-                $sourcesSelect = $connection->select()
-                    ->from($inventorySourceTable, ['source_code'])
-                    ->where('enabled = ?', 1);
-                $sources = $connection->fetchCol($sourcesSelect);
-                foreach ($sources as $sourceCode) {
-                    $connection->insertOnDuplicate($inventorySourceItemTable, [
-                        'source_code' => $sourceCode,
-                        'sku' => self::SKU,
-                        'quantity' => 99999,
-                        'status' => 1
-                    ]);
-                }
-            }
+            // Insert or update 'default' source assignment
+            $connection->insertOnDuplicate($inventorySourceItemTable, [
+                'source_code' => 'default',
+                'sku' => self::SKU,
+                'quantity' => 99999,
+                'status' => 1
+            ]);
         }
 
         $this->moduleDataSetup->endSetup();
