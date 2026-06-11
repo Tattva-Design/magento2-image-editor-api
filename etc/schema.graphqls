@@ -80,6 +80,8 @@ input CreateImageEditorProjectInput {
     width: Int! @doc(description: "The project width.")
     height: Int! @doc(description: "The project height.")
     productSku: String @doc(description: "The associated product SKU.")
+    frameType: String @doc(description: "The selected frame type.")
+    paperType: String @doc(description: "The selected paper type.")
 }
 
 input UpdateImageEditorProjectInput {
@@ -92,6 +94,8 @@ input UpdateImageEditorProjectInput {
     canvasObject: Json @doc(description: "The canvas object JSON structure.")
     status: String @doc(description: "The project status.")
     productSku: String @doc(description: "The associated product SKU.")
+    frameType: String @doc(description: "The selected frame type.")
+    paperType: String @doc(description: "The selected paper type.")
 }
 
 scalar Upload @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl\\UploadType") @doc(description: "The Upload scalar type represents file uploads.")
@@ -158,6 +162,8 @@ type ImageEditorProject {
     height: Int! @doc(description: "The project height.")
     status: String! @doc(description: "The project status.")
     productSku: String @doc(description: "The associated product SKU.")
+    frameType: String @doc(description: "The selected frame type.")
+    paperType: String @doc(description: "The selected paper type.")
     canvasObject: Json @doc(description: "The stored canvas object JSON structure.")
     thumbnailUrl: String @doc(description: "The project's thumbnail image URL.")
     createdAt: String! @doc(description: "The project creation timestamp.")

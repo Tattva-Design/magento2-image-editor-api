@@ -13,6 +13,8 @@
         <column xsi:type="int" name="height" padding="10" unsigned="true" nullable="false" identity="false" comment="Project Height"/>
         <column xsi:type="varchar" name="status" nullable="false" length="32" comment="Project Status"/>
         <column xsi:type="varchar" name="product_sku" nullable="true" length="64" comment="Product SKU"/>
+        <column xsi:type="varchar" name="frame_type" nullable="true" length="64" comment="Frame Type"/>
+        <column xsi:type="varchar" name="paper_type" nullable="true" length="64" comment="Paper Type"/>
         <column xsi:type="mediumtext" name="canvas_object" nullable="true" comment="Canvas Object JSON"/>
         <column xsi:type="varchar" name="thumbnail" nullable="true" length="255" comment="Thumbnail Image Path"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
