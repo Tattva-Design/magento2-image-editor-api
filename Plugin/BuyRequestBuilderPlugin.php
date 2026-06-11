@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace TattvaDesign\ImageEditorApi\Plugin;
 
-use Magento\QuoteGraphQl\Model\Cart\BuyRequest\BuyRequestBuilder;
-use Magento\QuoteGraphQl\Model\Cart\BuyRequest\CartItemData;
+use Magento\Quote\Model\Cart\BuyRequest\BuyRequestBuilder;
+use Magento\Framework\DataObject;
+use Magento\Quote\Model\Cart\Data\CartItem;
 use TattvaDesign\ImageEditorApi\Model\Registry\CartProjectRegistry;
 
 class BuyRequestBuilderPlugin
@@ -20,13 +21,15 @@ class BuyRequestBuilderPlugin
      */
     public function afterBuild(
         BuyRequestBuilder $subject,
-        array $result,
-        CartItemData $cartItemData
-    ): array {
-        $sku = trim($cartItemData->getSku());
-        $uuid = $this->registry->getAndRemove($sku);
-        if ($uuid) {
-            $result['project_uuid'] = $uuid;
+        DataObject $result,
+        CartItem $cartItem
+    ): DataObject {
+        $sku = trim($cartItem->getSku());
+        if ($sku !== '') {
+            $uuid = $this->registry->getAndRemove($sku);
+            if ($uuid) {
+                $result->setData('project_uuid', $uuid);
+            }
         }
         return $result;
     }

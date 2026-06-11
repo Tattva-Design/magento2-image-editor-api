@@ -18,7 +18,7 @@
                 sortOrder="10"/>
     </type>
 
-    <type name="Magento\QuoteGraphQl\Model\Cart\BuyRequest\BuyRequestBuilder">
+    <type name="Magento\Quote\Model\Cart\BuyRequest\BuyRequestBuilder">
         <plugin name="tattva_design_image_editor_buy_request_builder_plugin"
                 type="TattvaDesign\ImageEditorApi\Plugin\BuyRequestBuilderPlugin"
                 sortOrder="10"/>
@@ -27,6 +27,12 @@
     <type name="Magento\Quote\Model\Quote\Item">
         <plugin name="tattva_design_image_editor_quote_item_represent_product_plugin"
                 type="TattvaDesign\ImageEditorApi\Plugin\QuoteItemPlugin"
+                sortOrder="10"/>
+    </type>
+
+    <type name="Magento\QuoteGraphQl\Model\CartItem\GetItemsData">
+        <plugin name="tattva_design_image_editor_get_items_data_plugin"
+                type="TattvaDesign\ImageEditorApi\Plugin\GetItemsDataPlugin"
                 sortOrder="10"/>
     </type>
 </config>
