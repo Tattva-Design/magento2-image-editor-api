@@ -35,4 +35,10 @@
                 type="TattvaDesign\ImageEditorApi\Plugin\GetItemsDataPlugin"
                 sortOrder="10"/>
     </type>
+
+    <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
+        <plugin name="tattva_design_image_editor_to_order_item_plugin"
+                type="TattvaDesign\ImageEditorApi\Plugin\QuoteToOrderItem"
+                sortOrder="10"/>
+    </type>
 </config>
