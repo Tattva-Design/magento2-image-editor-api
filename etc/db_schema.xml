@@ -55,6 +55,7 @@
         <column xsi:type="bigint" name="size_bytes" padding="20" unsigned="true" nullable="false" identity="false" comment="File Size Bytes"/>
         <column xsi:type="int" name="width" padding="10" unsigned="true" nullable="true" identity="false" comment="Image Width"/>
         <column xsi:type="int" name="height" padding="10" unsigned="true" nullable="true" identity="false" comment="Image Height"/>
+        <column xsi:type="text" name="description" nullable="true" comment="Image Description"/>
         <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
         <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">
