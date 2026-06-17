@@ -170,6 +170,49 @@
       "response": []
     },
     {
+      "name": "Upload Default Image",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{customer_token}}"
+          }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "operations",
+              "value": "{\"query\":\"mutation CreateImageEditorDefaultImage($input: CreateImageEditorDefaultImageInput!) {\\n  createImageEditorDefaultImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    fileUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    description\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"description\":\"Lush forest scene with tall trees\",\"file\":null}}}",
+              "type": "text"
+            },
+            {
+              "key": "map",
+              "value": "{\"image\":[\"variables.input.file\"]}",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": []
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}",
+          "host": [
+            "{{base_url}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "Get Project Images",
       "request": {
         "method": "POST",

@@ -45,6 +45,11 @@ type Mutation {
     ): ImageEditorProjectImage!
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CreateProjectImage")
     @doc(description: "Uploads an image to an existing project for the current customer in the current store.")
+    createImageEditorDefaultImage(
+        input: CreateImageEditorDefaultImageInput!
+    ): ImageEditorProjectImage!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CreateDefaultImage")
+    @doc(description: "Uploads a new global default system image.")
     deleteImageEditorProjectImage(
         imageUuid: String!
     ): DeleteImageEditorProjectImageResult!
@@ -80,6 +85,11 @@ scalar Upload @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\Graph
 input CreateImageEditorProjectImageInput {
     projectUuid: String! @doc(description: "The project UUID.")
     file: Upload! @doc(description: "The uploaded file.")
+}
+
+input CreateImageEditorDefaultImageInput {
+    file: Upload! @doc(description: "The uploaded file.")
+    description: String @doc(description: "The description of the default image.")
 }
 
 input UpdateImageEditorProjectThumbnailInput {

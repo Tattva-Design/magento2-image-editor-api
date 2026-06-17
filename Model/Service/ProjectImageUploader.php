@@ -256,4 +256,60 @@ class ProjectImageUploader
         $baseName = pathinfo($originalName, PATHINFO_FILENAME);
         return substr($imageUuid, 0, 8) . '-' . $baseName . '-thumbnail.' . strtolower($extension);
     }
+
+    /**
+     * @param array{originalName: string, binaryContent: string, description: ?string} $input
+     * @return array<string, mixed>
+     */
+    public function uploadDefault(array $input): array
+    {
+        $imageMetadata = $this->extractImageMetadata($input['binaryContent'], $input['originalName']);
+        $imageUuid = $this->uuidGenerator->generate();
+
+        $originalName = $this->normalizeBaseName($input['originalName']) . '.' . strtolower($imageMetadata['extension']);
+        $fileName = substr($imageUuid, 0, 8) . '-' . $originalName;
+        
+        $defaultsPath = 'tattva/image-editor/defaults/';
+        $filePath = $defaultsPath . $fileName;
+
+        try {
+            $imageId = $this->projectImageResource->insertImage([
+                'uuid' => $imageUuid,
+                'project_id' => null,
+                'customer_id' => null,
+                'store_id' => null,
+                'status' => self::IMAGE_STATUS,
+                'file_name' => $fileName,
+                'original_name' => $originalName,
+                'file_path' => $filePath,
+                'mime_type' => $imageMetadata['mimeType'],
+                'extension' => $imageMetadata['extension'],
+                'size_bytes' => $imageMetadata['sizeBytes'],
+                'width' => $imageMetadata['width'],
+                'height' => $imageMetadata['height'],
+                'description' => $input['description'] ?? null,
+            ]);
+        } catch (\Throwable $exception) {
+            throw new GraphQlInputException(__('Unable to upload the default image at this time.'));
+        }
+
+        $mediaDirectory = $this->filesystem->getDirectoryWrite(DirectoryList::MEDIA);
+
+        try {
+            $mediaDirectory->create($defaultsPath);
+            
+            // Save original image
+            $mediaDirectory->writeFile($filePath, $input['binaryContent']);
+        } catch (\Throwable $exception) {
+            if (isset($mediaDirectory) && $mediaDirectory->isExist($filePath)) {
+                $mediaDirectory->delete($filePath);
+            }
+            $this->projectImageResource->deleteImageById($imageId);
+            throw new GraphQlInputException(__('Unable to save the default image file.'));
+        }
+
+        return $this->projectImageDataMapper->mapRow(
+            $this->projectImageResource->getImageRowById($imageId)
+        );
+    }
 }
