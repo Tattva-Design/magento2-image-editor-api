@@ -22,6 +22,11 @@ type Query {
     ): ImageEditorProjectImageListResult!
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\DefaultImages")
     @doc(description: "Returns the global default system images.")
+    imageEditorProject(
+        uuid: String! @doc(description: "The project UUID.")
+    ): ImageEditorProject!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\Project")
+    @doc(description: "Returns the single project details by UUID.")
 }
 
 type Mutation {
