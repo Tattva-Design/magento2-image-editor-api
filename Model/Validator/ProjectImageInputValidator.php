@@ -52,6 +52,31 @@ class ProjectImageInputValidator
         ];
     }
 
+    /**
+     * @param array<string, mixed> $input
+     * @return array{originalName: string, binaryContent: string, description: ?string}
+     */
+    public function validateDefaultInput(array $input): array
+    {
+        $file = $input['file'] ?? null;
+        $description = isset($input['description']) ? trim((string) $input['description']) : null;
+
+        if (!is_array($file) || !isset($file['tmp_name']) || (int) ($file['size'] ?? 0) <= 0) {
+            throw new GraphQlInputException(__('The "file" value must be a valid uploaded file.'));
+        }
+
+        $binaryContent = @file_get_contents((string) $file['tmp_name']);
+        if ($binaryContent === false || $binaryContent === '') {
+            throw new GraphQlInputException(__('The uploaded file could not be read.'));
+        }
+
+        return [
+            'originalName' => trim((string) ($file['name'] ?? '')),
+            'binaryContent' => $binaryContent,
+            'description' => $description,
+        ];
+    }
+
     private function requireNonEmptyString(string $fieldName, mixed $value): string
     {
         $normalizedValue = trim((string) $value);

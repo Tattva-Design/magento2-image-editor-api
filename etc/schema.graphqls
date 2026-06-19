@@ -16,6 +16,7 @@ type Query {
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\ProjectImages")
     @doc(description: "Returns the current customer's project images for the current store.")
     imageEditorDefaultImages(
+        search: String @doc(description: "Search keyword(s) to filter by description.")
         pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
         currentPage: Int = 1 @doc(description: "The current results page, starting from 1.")
     ): ImageEditorProjectImageListResult!
@@ -44,6 +45,11 @@ type Mutation {
     ): ImageEditorProjectImage!
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CreateProjectImage")
     @doc(description: "Uploads an image to an existing project for the current customer in the current store.")
+    createImageEditorDefaultImage(
+        input: CreateImageEditorDefaultImageInput!
+    ): ImageEditorProjectImage!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CreateDefaultImage")
+    @doc(description: "Uploads a new global default system image.")
     deleteImageEditorProjectImage(
         imageUuid: String!
     ): DeleteImageEditorProjectImageResult!
@@ -79,6 +85,11 @@ scalar Upload @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\Graph
 input CreateImageEditorProjectImageInput {
     projectUuid: String! @doc(description: "The project UUID.")
     file: Upload! @doc(description: "The uploaded file.")
+}
+
+input CreateImageEditorDefaultImageInput {
+    file: Upload! @doc(description: "The uploaded file.")
+    description: String @doc(description: "The description of the default image.")
 }
 
 input UpdateImageEditorProjectThumbnailInput {
@@ -165,6 +176,7 @@ type ImageEditorProjectImage {
     sizeBytes: Int! @doc(description: "The image file size in bytes.")
     width: Int @doc(description: "The image width in pixels.")
     height: Int @doc(description: "The image height in pixels.")
+    description: String @doc(description: "The description of the image.")
     isDefault: Boolean! @doc(description: "Whether the image is a global default system image.")
     createdAt: String! @doc(description: "The image creation timestamp.")
     updatedAt: String! @doc(description: "The image last update timestamp.")

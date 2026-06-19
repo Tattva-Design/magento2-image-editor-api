@@ -195,16 +195,32 @@ class ProjectImageResource
      */
     public function getDefaultImageList(
         int $currentPage,
-        int $pageSize
+        int $pageSize,
+        ?string $search = null
     ): array {
         $connection = $this->getConnection();
         $whereClause = 'project_id IS NULL AND customer_id IS NULL';
 
-        $totalCount = (int) $connection->fetchOne(
-            $connection->select()
-                ->from($this->getTableName(), [new \Zend_Db_Expr('COUNT(*)')])
-                ->where($whereClause)
-        );
+        $select = $connection->select()
+            ->from($this->getTableName(), [new \Zend_Db_Expr('COUNT(*)')])
+            ->where($whereClause);
+
+        if ($search !== null && trim($search) !== '') {
+            $keywords = preg_split('/\s+/', trim($search));
+            if ($keywords) {
+                $conditions = [];
+                foreach ($keywords as $keyword) {
+                    if ($keyword !== '') {
+                        $conditions[] = $connection->quoteInto('description LIKE ?', '%' . $keyword . '%');
+                    }
+                }
+                if ($conditions) {
+                    $select->where(implode(' OR ', $conditions));
+                }
+            }
+        }
+
+        $totalCount = (int) $connection->fetchOne($select);
 
         $totalPages = $pageSize > 0 ? (int) ceil($totalCount / $pageSize) : 0;
         if ($totalCount > 0 && $currentPage > $totalPages) {
@@ -215,13 +231,29 @@ class ProjectImageResource
 
         $offset = ($currentPage - 1) * $pageSize;
 
-        $rows = $connection->fetchAll(
-            $connection->select()
-                ->from($this->getTableName(), $this->projectImageDataMapper->getSelectColumns())
-                ->where($whereClause)
-                ->order('id ASC')
-                ->limit($pageSize, $offset)
-        );
+        $selectRows = $connection->select()
+            ->from($this->getTableName(), $this->projectImageDataMapper->getSelectColumns())
+            ->where($whereClause);
+
+        if ($search !== null && trim($search) !== '') {
+            $keywords = preg_split('/\s+/', trim($search));
+            if ($keywords) {
+                $conditions = [];
+                foreach ($keywords as $keyword) {
+                    if ($keyword !== '') {
+                        $conditions[] = $connection->quoteInto('description LIKE ?', '%' . $keyword . '%');
+                    }
+                }
+                if ($conditions) {
+                    $selectRows->where(implode(' OR ', $conditions));
+                }
+            }
+        }
+
+        $selectRows->order('id ASC')
+            ->limit($pageSize, $offset);
+
+        $rows = $connection->fetchAll($selectRows);
 
         return [
             'totalCount' => $totalCount,

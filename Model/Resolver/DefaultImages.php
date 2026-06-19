@@ -35,6 +35,7 @@ class DefaultImages implements ResolverInterface
         $this->customerContextValidator->getCustomerId($context);
         $currentPage = (int) ($args['currentPage'] ?? 1);
         $pageSize = (int) ($args['pageSize'] ?? self::DEFAULT_PAGE_SIZE);
+        $search = isset($args['search']) ? trim((string) $args['search']) : null;
 
         if ($currentPage < 1) {
             throw new GraphQlInputException(__('The "currentPage" value must be greater than 0.'));
@@ -46,6 +47,6 @@ class DefaultImages implements ResolverInterface
             );
         }
 
-        return $this->projectImageResource->getDefaultImageList($currentPage, $pageSize);
+        return $this->projectImageResource->getDefaultImageList($currentPage, $pageSize, $search);
     }
 }
