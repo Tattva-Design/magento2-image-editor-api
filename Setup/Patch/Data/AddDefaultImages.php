@@ -93,6 +93,14 @@ class AddDefaultImages implements DataPatchInterface
             $height = $imageInfo !== false ? (int) $imageInfo[1] : null;
             $sizeBytes = @filesize($sourcePath) ?: 0;
 
+            // Generate and save thumbnail
+            $targetThumbnailFileName = $formattedIndex . '-thumbnail.' . $extension;
+            $targetThumbnailPath = $targetDefaultsDir . '/' . $targetThumbnailFileName;
+            if ($fileContent !== false) {
+                $thumbnailContent = $this->resizeImage($fileContent, $mimeType, 600);
+                $mediaDirectory->writeFile($targetThumbnailPath, $thumbnailContent);
+            }
+
             // Insert fresh DB record
             $connection->insert($tableName, [
                 'uuid' => $this->uuidGenerator->generate(),
@@ -103,6 +111,7 @@ class AddDefaultImages implements DataPatchInterface
                 'file_name' => $targetFileName,
                 'original_name' => $formattedIndex,
                 'file_path' => $targetPath,
+                'thumbnail_path' => $targetThumbnailPath,
                 'mime_type' => $mimeType,
                 'extension' => $extension,
                 'size_bytes' => $sizeBytes,
@@ -115,5 +124,76 @@ class AddDefaultImages implements DataPatchInterface
 
         $this->moduleDataSetup->endSetup();
         return $this;
+    }
+
+    /**
+     * Resize image content using PHP GD library to a maximum dimension
+     *
+     * @param string $binaryContent
+     * @param string $mimeType
+     * @param int $maxDimension
+     * @return string Resized binary content
+     */
+    private function resizeImage(string $binaryContent, string $mimeType, int $maxDimension = 600): string
+    {
+        $srcImage = @imagecreatefromstring($binaryContent);
+        if (!$srcImage) {
+            return $binaryContent; // Fallback to original content if GD fails to load
+        }
+
+        $width = imagesx($srcImage);
+        $height = imagesy($srcImage);
+
+        if ($width <= $maxDimension && $height <= $maxDimension) {
+            imagedestroy($srcImage);
+            return $binaryContent; // No resizing needed, return original
+        }
+
+        $ratio = min($maxDimension / $width, $maxDimension / $height);
+        $newWidth = (int) round($width * $ratio);
+        $newHeight = (int) round($height * $ratio);
+
+        $dstImage = imagecreatetruecolor($newWidth, $newHeight);
+        if (!$dstImage) {
+            imagedestroy($srcImage);
+            return $binaryContent;
+        }
+
+        // Preserve transparency for PNG, WebP and GIF
+        if ($mimeType === 'image/png' || $mimeType === 'image/webp' || $mimeType === 'image/gif') {
+            imagealphablending($dstImage, false);
+            imagesavealpha($dstImage, true);
+            $transparent = imagecolorallocatealpha($dstImage, 255, 255, 255, 127);
+            if ($transparent !== false) {
+                imagefilledrectangle($dstImage, 0, 0, $newWidth, $newHeight, $transparent);
+            }
+        }
+
+        imagecopyresampled($dstImage, $srcImage, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        ob_start();
+        switch ($mimeType) {
+            case 'image/jpeg':
+                imagejpeg($dstImage, null, 90);
+                break;
+            case 'image/png':
+                imagepng($dstImage, null, 9);
+                break;
+            case 'image/webp':
+                imagewebp($dstImage, null, 90);
+                break;
+            case 'image/gif':
+                imagegif($dstImage);
+                break;
+            default:
+                imagejpeg($dstImage, null, 90);
+                break;
+        }
+        $resizedContent = ob_get_clean();
+
+        imagedestroy($srcImage);
+        imagedestroy($dstImage);
+
+        return $resizedContent ?: $binaryContent;
     }
 }
