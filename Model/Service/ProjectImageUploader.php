@@ -272,6 +272,9 @@ class ProjectImageUploader
         $defaultsPath = 'tattva/image-editor/defaults/';
         $filePath = $defaultsPath . $fileName;
 
+        $thumbnailFileName = substr($imageUuid, 0, 8) . '-' . $this->normalizeBaseName($input['originalName']) . '-thumbnail.' . strtolower($imageMetadata['extension']);
+        $thumbnailFilePath = $defaultsPath . $thumbnailFileName;
+
         try {
             $imageId = $this->projectImageResource->insertImage([
                 'uuid' => $imageUuid,
@@ -282,6 +285,7 @@ class ProjectImageUploader
                 'file_name' => $fileName,
                 'original_name' => $originalName,
                 'file_path' => $filePath,
+                'thumbnail_path' => $thumbnailFilePath,
                 'mime_type' => $imageMetadata['mimeType'],
                 'extension' => $imageMetadata['extension'],
                 'size_bytes' => $imageMetadata['sizeBytes'],
@@ -300,9 +304,22 @@ class ProjectImageUploader
             
             // Save original image
             $mediaDirectory->writeFile($filePath, $input['binaryContent']);
+
+            // Generate and save thumbnail
+            $thumbnailContent = $this->resizeImage(
+                $input['binaryContent'],
+                $imageMetadata['mimeType'],
+                600
+            );
+            $mediaDirectory->writeFile($thumbnailFilePath, $thumbnailContent);
         } catch (\Throwable $exception) {
-            if (isset($mediaDirectory) && $mediaDirectory->isExist($filePath)) {
-                $mediaDirectory->delete($filePath);
+            if (isset($mediaDirectory)) {
+                if ($mediaDirectory->isExist($filePath)) {
+                    $mediaDirectory->delete($filePath);
+                }
+                if ($mediaDirectory->isExist($thumbnailFilePath)) {
+                    $mediaDirectory->delete($thumbnailFilePath);
+                }
             }
             $this->projectImageResource->deleteImageById($imageId);
             throw new GraphQlInputException(__('Unable to save the default image file.'));
