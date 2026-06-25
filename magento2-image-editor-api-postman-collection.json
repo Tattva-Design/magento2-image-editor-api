@@ -145,7 +145,7 @@
           "formdata": [
             {
               "key": "operations",
-              "value": "{\"query\":\"mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\\n  createImageEditorProjectImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    fileUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    description\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"projectUuid\":\"INSERT_PROJECT_UUID_HERE\",\"file\":null}}}",
+              "value": "{\"query\":\"mutation CreateImageEditorProjectImage($input: CreateImageEditorProjectImageInput!) {\\n  createImageEditorProjectImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    imageUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    description\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"projectUuid\":\"INSERT_PROJECT_UUID_HERE\",\"file\":null}}}",
               "type": "text"
             },
             {
@@ -188,7 +188,7 @@
           "formdata": [
             {
               "key": "operations",
-              "value": "{\"query\":\"mutation CreateImageEditorDefaultImage($input: CreateImageEditorDefaultImageInput!) {\\n  createImageEditorDefaultImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    fileUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    description\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"description\":\"Lush forest scene with tall trees\",\"file\":null}}}",
+              "value": "{\"query\":\"mutation CreateImageEditorDefaultImage($input: CreateImageEditorDefaultImageInput!) {\\n  createImageEditorDefaultImage(input: $input) {\\n    id\\n    uuid\\n    projectId\\n    customerId\\n    storeId\\n    status\\n    fileName\\n    originalName\\n    filePath\\n    imageUrl\\n    thumbnailUrl\\n    mimeType\\n    extension\\n    sizeBytes\\n    width\\n    height\\n    description\\n    createdAt\\n    updatedAt\\n  }\\n}\",\"variables\":{\"input\":{\"description\":\"Lush forest scene with tall trees\",\"file\":null}}}",
               "type": "text"
             },
             {
@@ -229,7 +229,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "query GetProjectImages($projectUuid: String!, $pageSize: Int, $currentPage: Int) {\n  imageEditorProjectImages(projectUuid: $projectUuid, pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      status\n      fileName\n      originalName\n      filePath\n      fileUrl\n      thumbnailUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      description\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
+            "query": "query GetProjectImages($projectUuid: String!, $pageSize: Int, $currentPage: Int) {\n  imageEditorProjectImages(projectUuid: $projectUuid, pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      status\n      fileName\n      originalName\n      filePath\n      imageUrl\n      thumbnailUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      description\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
             "variables": "{\n  \"projectUuid\": \"INSERT_PROJECT_UUID_HERE\",\n  \"pageSize\": 10,\n  \"currentPage\": 1\n}"
           }
         },
@@ -259,7 +259,7 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "query GetDefaultImages($search: String, $pageSize: Int, $currentPage: Int) {\n  imageEditorDefaultImages(search: $search, pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      status\n      fileName\n      originalName\n      filePath\n      fileUrl\n      thumbnailUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      description\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
+            "query": "query GetDefaultImages($search: String, $pageSize: Int, $currentPage: Int) {\n  imageEditorDefaultImages(search: $search, pageSize: $pageSize, currentPage: $currentPage) {\n    totalCount\n    items {\n      id\n      uuid\n      projectId\n      customerId\n      storeId\n      status\n      fileName\n      originalName\n      filePath\n      imageUrl\n      thumbnailUrl\n      mimeType\n      extension\n      sizeBytes\n      width\n      height\n      description\n      createdAt\n      updatedAt\n    }\n    pageInfo {\n      pageSize\n      currentPage\n      totalPages\n      hasNextPage\n      hasPreviousPage\n    }\n  }\n}",
             "variables": "{\n  \"pageSize\": 10,\n  \"currentPage\": 1,\n  \"search\": \"Nature River\"\n}"
           }
         },
