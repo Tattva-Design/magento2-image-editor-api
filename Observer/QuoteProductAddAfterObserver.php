@@ -39,7 +39,7 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                     $product = $item->getProduct();
                     $productSku = $product ? $product->getSku() : '';
 
-                    if ($productSku === 'customisable-product') {
+                    if ($productSku === 'customisable-product' || $productSku === 'Customise product') {
                         // Fetch project details from database
                         try {
                             $select = $connection->select()
@@ -53,25 +53,27 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                                     $item->setName($projectRow['name']);
                                 }
 
-                                // 2. Build and set custom SKU: customisable-product-size-frame-paper
-                                $sku = 'customisable-product';
-                                if (!empty($projectRow['size'])) {
-                                    $sku .= '-' . $projectRow['size'];
-                                }
-                                if (!empty($projectRow['frame_type'])) {
-                                    $sku .= '-' . $projectRow['frame_type'];
-                                }
-                                if (!empty($projectRow['paper_type'])) {
-                                    $sku .= '-' . $projectRow['paper_type'];
-                                }
-                                // Clean spaces and make it standard format
-                                $sku = str_replace(' ', '-', $sku);
-                                $item->setSku($sku);
+                                if ($productSku === 'customisable-product') {
+                                    // 2. Build and set custom SKU: customisable-product-size-frame-paper
+                                    $sku = 'customisable-product';
+                                    if (!empty($projectRow['size'])) {
+                                        $sku .= '-' . $projectRow['size'];
+                                    }
+                                    if (!empty($projectRow['frame_type'])) {
+                                        $sku .= '-' . $projectRow['frame_type'];
+                                    }
+                                    if (!empty($projectRow['paper_type'])) {
+                                        $sku .= '-' . $projectRow['paper_type'];
+                                    }
+                                    // Clean spaces and make it standard format
+                                    $sku = str_replace(' ', '-', $sku);
+                                    $item->setSku($sku);
 
-                                // 3. Set custom price to 500 INR
-                                $item->setCustomPrice(500.00);
-                                $item->setOriginalCustomPrice(500.00);
-                                $item->getProduct()->setIsSuperMode(true);
+                                    // 3. Set custom price to 500 INR
+                                    $item->setCustomPrice(500.00);
+                                    $item->setOriginalCustomPrice(500.00);
+                                    $item->getProduct()->setIsSuperMode(true);
+                                }
                             }
                         } catch (\Throwable $e) {
                             // Keep it robust to not break standard add to cart flow

@@ -199,8 +199,8 @@
         "body": {
           "mode": "graphql",
           "graphql": {
-            "query": "mutation AddProductsToCart($cartId: String!, $cartItems: [CartItemInput!]!) {\n  addProductsToCart(cartId: $cartId, cartItems: $cartItems) {\n    cart {\n      id\n      items {\n        id\n        quantity\n        product {\n          sku\n          name\n        }\n        prices {\n          price {\n            value\n            currency\n          }\n        }\n      }\n    }\n  }\n}",
-            "variables": "{\n  \"cartId\": \"INSERT_CART_ID_HERE\",\n  \"cartItems\": [\n    {\n      \"sku\": \"customisable-product\",\n      \"quantity\": 1,\n      \"project_uuid\": \"INSERT_PROJECT_UUID_HERE\"\n    }\n  ]\n}"
+            "query": "mutation AddProductsToCart($cartId: String!, $cartItems: [CartItemInput!]!) {\n  addProductsToCart(cartId: $cartId, cartItems: $cartItems) {\n    cart {\n      id\n      items {\n        id\n        quantity\n        project_uuid\n        ... on SimpleCartItem {\n          project_thumbnail_url\n        }\n        ... on ConfigurableCartItem {\n          project_thumbnail_url\n        }\n        product {\n          sku\n          name\n        }\n        prices {\n          price {\n            value\n            currency\n          }\n        }\n      }\n    }\n  }\n}",
+            "variables": "{\n  \"cartId\": \"INSERT_CART_ID_HERE\",\n  \"cartItems\": [\n    {\n      \"sku\": \"Customise product\",\n      \"quantity\": 1,\n      \"project_uuid\": \"INSERT_PROJECT_UUID_HERE\"\n    }\n  ]\n}"
           }
         },
         "url": {

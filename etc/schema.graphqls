@@ -208,14 +208,17 @@ input CartItemInput {
 }
 
 interface CartItemInterface {
+    project_uuid: String @doc(description: "Associated image editor project UUID")
 }
 
 type SimpleCartItem {
     project_thumbnail_url: String @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CartItemProjectThumbnail") @doc(description: "Project thumbnail image URL")
+    project_uuid: String @doc(description: "Associated image editor project UUID")
 }
 
 type ConfigurableCartItem {
     project_thumbnail_url: String @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CartItemProjectThumbnail") @doc(description: "Project thumbnail image URL")
+    project_uuid: String @doc(description: "Associated image editor project UUID")
 }
 
 
