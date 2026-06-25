@@ -56,7 +56,7 @@ class ProjectImageDataMapper
             'fileName' => (string) $row['file_name'],
             'originalName' => (string) $row['original_name'],
             'filePath' => (string) $row['file_path'],
-            'fileUrl' => $this->buildFileUrl((string) $row['file_path']),
+            'imageUrl' => $this->buildFileUrl((string) $row['file_path']),
             'thumbnailUrl' => !empty($row['thumbnail_path']) ? $this->buildFileUrl((string) $row['thumbnail_path']) : null,
             'mimeType' => (string) $row['mime_type'],
             'extension' => (string) $row['extension'],
