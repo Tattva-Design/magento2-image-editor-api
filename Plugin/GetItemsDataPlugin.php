@@ -36,7 +36,7 @@ class GetItemsDataPlugin
                     $product = $cartItem->getProduct();
                     $productSku = $product ? $product->getSku() : '';
 
-                    if ($productSku === 'customisable-product' || $productSku === 'Customise product') {
+                    if (str_starts_with($productSku, 'customisable-product') || str_starts_with($productSku, 'Customise product')) {
                         if (isset($itemData['product']) && is_array($itemData['product'])) {
                             $customSku = $cartItem->getOrigData('sku') ?: ($cartItem->getData('sku') ?: $cartItem->getSku());
                             

@@ -39,7 +39,7 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                     $product = $item->getProduct();
                     $productSku = $product ? $product->getSku() : '';
 
-                    if ($productSku === 'customisable-product' || $productSku === 'Customise product') {
+                    if (str_starts_with($productSku, 'customisable-product') || str_starts_with($productSku, 'Customise product')) {
                         // Fetch project details from database
                         try {
                             $select = $connection->select()
@@ -76,7 +76,7 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                                 }
                             }
                         } catch (\Throwable $e) {
-                            // Keep it robust to not break standard add to cart flow
+                            // Keep it robust
                         }
                     }
                 }
