@@ -1,0 +1,161 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488.1409999999999 2213.1000000000004" width="488.1409999999999" height="2213.1000000000004" style="--bg:#1F1F1F;--fg:#CCCCCC;--line:#CCCCCC;--accent:#0078D4;--muted:#CCCCCCCC;--surface:#181818;--border:#CCCCCC;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 85%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="5" refX="7" refY="2.5" orient="auto">
+    <polygon points="0 0, 8 2.5, 0 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="5" refX="1" refY="2.5" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.5, 8 5" fill="var(--_arrow)" stroke="var(--_arrow)" stroke-width="0.75" stroke-linejoin="round" />
+  </marker>
+</defs>
+<g class="subgraph" data-id="UI" data-label="1. Frontend (Next.js / Image Editor)">
+  <rect x="45.928" y="40" width="396.2849999999999" height="402.3" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="45.928" y="40" width="396.2849999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="57.928" y="54" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">1. Frontend (Next.js / Image Editor)</text>
+</g>
+<g class="subgraph" data-id="API" data-label="2. Magento GraphQL &amp; Plugin Processing">
+  <rect x="40" y="502.3" width="408.1409999999999" height="419.20000000000005" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="40" y="502.3" width="408.1409999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="52" y="516.3" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">2. Magento GraphQL &amp; Plugin Processing</text>
+</g>
+<g class="subgraph" data-id="QUOTE" data-label="3. Quote &amp; Cart Management">
+  <rect x="81.49599999999995" y="981.5" width="325.149" height="436.80000000000007" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="81.49599999999995" y="981.5" width="325.149" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="93.49599999999995" y="995.5" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">3. Quote &amp; Cart Management</text>
+</g>
+<g class="subgraph" data-id="CART_QUERY" data-label="4. Cart Query &amp; Display">
+  <rect x="65.56450000000001" y="1478.3000000000002" width="357.0119999999999" height="249.40000000000003" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="65.56450000000001" y="1478.3000000000002" width="357.0119999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="77.56450000000001" y="1492.3000000000002" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">4. Cart Query &amp; Display</text>
+</g>
+<g class="subgraph" data-id="ORDER" data-label="5. Checkout &amp; Order Placement">
+  <rect x="78.90249999999997" y="1787.7000000000003" width="330.33599999999996" height="385.40000000000003" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <rect x="78.90249999999997" y="1787.7000000000003" width="330.33599999999996" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+  <text x="90.90249999999997" y="1801.7000000000003" font-size="12" font-weight="600" fill="var(--_text-sec)" dy="4.199999999999999">5. Checkout &amp; Order Placement</text>
+</g>
+<polyline class="edge" data-from="D" data-to="E" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,426.3 244.07049999999995,546.3" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="H" data-to="I" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,905.5 244.07049999999995,1025.5" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="L" data-to="M" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,1402.3000000000002 244.07049999999995,1522.3000000000002" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="N" data-to="O" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,1711.7000000000003 244.07049999999995,1831.7000000000003" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="A" data-to="B" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,137.8 244.07049999999995,185.8" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="B" data-to="C" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,239.60000000000002 244.07049999999995,287.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="C" data-to="D" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,324.5 244.07049999999995,372.5" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="E" data-to="F" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,583.2 244.07049999999995,631.2" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="F" data-to="G" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,685 244.07049999999995,733" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="G" data-to="H" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,820.6 244.07049999999995,868.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="I" data-to="J" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,1062.4 244.07049999999995,1110.4" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="J" data-to="K" data-style="solid" data-arrow-start="false" data-arrow-end="true" data-label="Different project_uuid or variants?" points="244.07049999999995,1147.3 244.07049999999995,1263.6" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="K" data-to="L" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,1317.4 244.07049999999995,1365.4" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="M" data-to="N" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,1576.1000000000001 244.07049999999995,1624.1000000000001" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="O" data-to="P" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,1868.6000000000004 244.07049999999995,1916.6000000000004" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="P" data-to="Q" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,1970.4000000000003 244.07049999999995,2018.4000000000003" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<polyline class="edge" data-from="Q" data-to="R" data-style="solid" data-arrow-start="false" data-arrow-end="true" points="244.07049999999995,2055.3 244.07049999999995,2103.3" fill="none" stroke="var(--_line)" stroke-width="1" marker-end="url(#arrowhead)" />
+<g class="edge-label" data-from="J" data-to="K" data-label="Different project_uuid or variants?">
+  <rect x="155.07049999999995" y="1190.3" width="177.43600000000004" height="30.3" rx="2" ry="2" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="1" />
+  <text x="243.78849999999997" y="1205.45" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-sec)" dy="3.8499999999999996">Different project_uuid or variants?</text>
+</g>
+<g class="node" data-id="A" data-label="User customizes frame
+(Uploads image, selects Size, Frame Type, Paper Type)" data-shape="rectangle">
+  <rect x="61.928" y="84" width="364.2849999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="110.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">User customizes frame</tspan><tspan x="244.07049999999995" dy="16.900000000000002">(Uploads image, selects Size, Frame Type, Paper Type)</tspan></text>
+</g>
+<g class="node" data-id="B" data-label="Save Project API
+(Mutation: createImageEditorProject)" data-shape="rectangle">
+  <rect x="116.39149999999998" y="185.8" width="255.35799999999995" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="212.70000000000002" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">Save Project API</tspan><tspan x="244.07049999999995" dy="16.900000000000002">(Mutation: createImageEditorProject)</tspan></text>
+</g>
+<g class="node" data-id="C" data-label="Receives project_uuid &amp; thumbnail" data-shape="rectangle">
+  <rect x="123.43099999999998" y="287.6" width="241.27899999999994" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="306.05" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Receives project_uuid &amp; thumbnail</text>
+</g>
+<g class="node" data-id="D" data-label="Trigger Add to Cart
+(Mutation: addProductsToCart with SKU &amp; project_uuid)" data-shape="rectangle">
+  <rect x="63.03950000000003" y="372.5" width="362.06199999999984" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="399.4" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">Trigger Add to Cart</tspan><tspan x="244.07049999999995" dy="16.900000000000002">(Mutation: addProductsToCart with SKU &amp; project_uuid)</tspan></text>
+</g>
+<g class="node" data-id="E" data-label="GraphQlBuyRequestBuilderPlugin" data-shape="rectangle">
+  <rect x="122.31949999999999" y="546.3" width="243.50199999999992" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="564.75" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">GraphQlBuyRequestBuilderPlugin</text>
+</g>
+<g class="node" data-id="F" data-label="Fetch project details from DB
+(size, frame_type, paper_type)" data-shape="rectangle">
+  <rect x="134.91649999999996" y="631.2" width="218.308" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="658.1" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">Fetch project details from DB</tspan><tspan x="244.07049999999995" dy="16.900000000000002">(size, frame_type, paper_type)</tspan></text>
+</g>
+<g class="node" data-id="G" data-label="Map to Super Attributes
+- Size: 138 (A3/A4/A5)
+- Frame: 137 (With/Without)
+- Paper: 139 (Art/Canvas)" data-shape="rectangle">
+  <rect x="149.36599999999996" y="733" width="189.409" height="87.60000000000001" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="776.8" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-20.8">Map to Super Attributes</tspan><tspan x="244.07049999999995" dy="16.900000000000002">- Size: 138 (A3/A4/A5)</tspan><tspan x="244.07049999999995" dy="16.900000000000002">- Frame: 137 (With/Without)</tspan><tspan x="244.07049999999995" dy="16.900000000000002">- Paper: 139 (Art/Canvas)</tspan></text>
+</g>
+<g class="node" data-id="H" data-label="Inject project_uuid &amp; super_attribute into info_buyRequest" data-shape="rectangle">
+  <rect x="56" y="868.6" width="376.1409999999999" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="887.0500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Inject project_uuid &amp; super_attribute into info_buyRequest</text>
+</g>
+<g class="node" data-id="I" data-label="Magento Quote Item Creation" data-shape="rectangle">
+  <rect x="140.84449999999998" y="1025.5" width="206.45199999999994" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="1043.95" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Magento Quote Item Creation</text>
+</g>
+<g class="node" data-id="J" data-label="QuoteItemPlugin: aroundRepresentProduct" data-shape="rectangle">
+  <rect x="97.49599999999995" y="1110.4" width="293.149" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="1128.8500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">QuoteItemPlugin: aroundRepresentProduct</text>
+</g>
+<g class="node" data-id="K" data-label="Create SEPARATE Cart Line Item
+(Prevents merging with other frames)" data-shape="rectangle">
+  <rect x="117.13249999999998" y="1263.6" width="253.87599999999995" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="1290.5" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">Create SEPARATE Cart Line Item</tspan><tspan x="244.07049999999995" dy="16.900000000000002">(Prevents merging with other frames)</tspan></text>
+</g>
+<g class="node" data-id="L" data-label="Save project_uuid on quote_item table" data-shape="rectangle">
+  <rect x="113.42749999999998" y="1365.4" width="261.28599999999994" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="1383.8500000000001" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Save project_uuid on quote_item table</text>
+</g>
+<g class="node" data-id="M" data-label="Cart Query / Response
+(GetItemsDataPlugin &amp; CartItemProjectThumbnail)" data-shape="rectangle">
+  <rect x="81.56450000000001" y="1522.3000000000002" width="325.0119999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="1549.2000000000003" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">Cart Query / Response</tspan><tspan x="244.07049999999995" dy="16.900000000000002">(GetItemsDataPlugin &amp; CartItemProjectThumbnail)</tspan></text>
+</g>
+<g class="node" data-id="N" data-label="Frontend Cart displays:
+- Custom Frame Name
+- Project Thumbnail
+- Selected Variants &amp; project_uuid" data-shape="rectangle">
+  <rect x="124.91299999999997" y="1624.1000000000001" width="238.31499999999997" height="87.60000000000001" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="1667.9" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-20.8">Frontend Cart displays:</tspan><tspan x="244.07049999999995" dy="16.900000000000002">- Custom Frame Name</tspan><tspan x="244.07049999999995" dy="16.900000000000002">- Project Thumbnail</tspan><tspan x="244.07049999999995" dy="16.900000000000002">- Selected Variants &amp; project_uuid</tspan></text>
+</g>
+<g class="node" data-id="O" data-label="Customer Places Order" data-shape="rectangle">
+  <rect x="154.18249999999995" y="1831.7000000000003" width="179.77599999999998" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999992" y="1850.1500000000003" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Customer Places Order</text>
+</g>
+<g class="node" data-id="P" data-label="Quote to Order Conversion
+(fieldset.xml &amp; QuoteToOrderItem plugin)" data-shape="rectangle">
+  <rect x="108.61099999999999" y="1916.6000000000004" width="270.9189999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="1943.5000000000005" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">Quote to Order Conversion</tspan><tspan x="244.07049999999995" dy="16.900000000000002">(fieldset.xml &amp; QuoteToOrderItem plugin)</tspan></text>
+</g>
+<g class="node" data-id="Q" data-label="Save project_uuid to sales_order_item table" data-shape="rectangle">
+  <rect x="94.90249999999997" y="2018.4000000000003" width="298.33599999999996" height="36.900000000000006" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="2036.8500000000004" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)" dy="4.55">Save project_uuid to sales_order_item table</text>
+</g>
+<g class="node" data-id="R" data-label="Admin Panel &amp; Fulfillment API
+Displays custom frame details &amp; project ID" data-shape="rectangle">
+  <rect x="103.7945" y="2103.3" width="280.5519999999999" height="53.800000000000004" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+  <text x="244.07049999999995" y="2130.2000000000003" text-anchor="middle" font-size="13" font-weight="500" fill="var(--_text)"><tspan x="244.07049999999995" dy="-3.9000000000000012">Admin Panel &amp; Fulfillment API</tspan><tspan x="244.07049999999995" dy="16.900000000000002">Displays custom frame details &amp; project ID</tspan></text>
+</g>
+</svg>

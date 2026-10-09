@@ -17,6 +17,10 @@
 
 ## 🗺️ Roadmap: Cart API Project ID & Variants Integration
 
+> 📊 **Architecture Flow Chart & Diagram:**
+> - (`docs/diagrams/cart-flow.svg`)
+> - (`docs/diagrams/flow-chart.svg`)
+
 ### **Group 1: Database & Data Persistence Setup**
 - [ ] **Task 1.1: Declare DB Schema Columns**
   - Verify and ensure `project_uuid` / `project_id` column exists in `quote_item` in `etc/db_schema.xml`.
