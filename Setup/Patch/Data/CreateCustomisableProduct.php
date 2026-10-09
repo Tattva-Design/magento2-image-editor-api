@@ -94,28 +94,46 @@ class CreateCustomisableProduct implements DataPatchInterface
             ]);
         }
 
-        // 2. Populate legacy cataloginventory_stock_status table
+        // 2. Populate legacy cataloginventory_stock_status table for admin (0) and all websites
         $stockStatusTable = $this->moduleDataSetup->getTable('cataloginventory_stock_status');
         if ($connection->isTableExists($stockStatusTable)) {
-            $connection->insertOnDuplicate($stockStatusTable, [
-                'product_id' => $productId,
-                'website_id' => 0,
-                'stock_id' => 1,
-                'qty' => 99999,
-                'stock_status' => 1
-            ]);
+            $allWebsites = array_unique(array_merge([0], $websiteIds));
+            foreach ($allWebsites as $webId) {
+                $connection->insertOnDuplicate($stockStatusTable, [
+                    'product_id' => $productId,
+                    'website_id' => (int)$webId,
+                    'stock_id' => 1,
+                    'qty' => 99999,
+                    'stock_status' => 1
+                ]);
+            }
         }
 
-        // 3. Populate MSI inventory_source_item table if MSI is enabled
+        // 3. Populate MSI inventory_source_item table for all active inventory sources
         $inventorySourceItemTable = $this->moduleDataSetup->getTable('inventory_source_item');
         if ($connection->isTableExists($inventorySourceItemTable)) {
-            // Insert or update 'default' source assignment
-            $connection->insertOnDuplicate($inventorySourceItemTable, [
-                'source_code' => 'default',
-                'sku' => self::SKU,
-                'quantity' => 99999,
-                'status' => 1
-            ]);
+            $inventorySourceTable = $this->moduleDataSetup->getTable('inventory_source');
+            $sources = ['default'];
+            if ($connection->isTableExists($inventorySourceTable)) {
+                try {
+                    $select = $connection->select()->from($inventorySourceTable, ['source_code']);
+                    $fetchedSources = $connection->fetchCol($select);
+                    if (!empty($fetchedSources)) {
+                        $sources = array_unique(array_merge($sources, $fetchedSources));
+                    }
+                } catch (\Throwable $e) {
+                    // Fallback to default
+                }
+            }
+
+            foreach ($sources as $sourceCode) {
+                $connection->insertOnDuplicate($inventorySourceItemTable, [
+                    'source_code' => $sourceCode,
+                    'sku' => self::SKU,
+                    'quantity' => 99999,
+                    'status' => 1
+                ]);
+            }
         }
 
         $this->moduleDataSetup->endSetup();
