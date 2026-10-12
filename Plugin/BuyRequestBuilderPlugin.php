@@ -8,12 +8,14 @@ use Magento\Quote\Model\Cart\BuyRequest\BuyRequestBuilder;
 use Magento\Framework\DataObject;
 use Magento\Quote\Model\Cart\Data\CartItem;
 use TattvaDesign\ImageEditorApi\Model\Registry\CartProjectRegistry;
+use TattvaDesign\ImageEditorApi\Model\Service\ProjectSuperAttributeMapper;
 
 class BuyRequestBuilderPlugin
 {
     public function __construct(
         private readonly CartProjectRegistry $registry,
-        private readonly \Magento\Framework\App\ResourceConnection $resourceConnection
+        private readonly \Magento\Framework\App\ResourceConnection $resourceConnection,
+        private readonly ProjectSuperAttributeMapper $superAttributeMapper
     ) {
     }
 
@@ -31,7 +33,7 @@ class BuyRequestBuilderPlugin
             if ($uuid) {
                 $result->setData('project_uuid', $uuid);
 
-                if ($sku === 'Customise product' || $sku === 'customisable-product') {
+                if ($this->superAttributeMapper->isCustomisableProductSku($sku)) {
                     $connection = $this->resourceConnection->getConnection();
                     $tableName = $this->resourceConnection->getTableName('tattva_image_editor_project');
                     try {
@@ -40,33 +42,19 @@ class BuyRequestBuilderPlugin
                             ->where('uuid = ?', $uuid);
                         $projectRow = $connection->fetchRow($select);
                         if ($projectRow) {
-                            $size = isset($projectRow['size']) ? strtolower(trim((string)$projectRow['size'])) : '';
-                            $frameType = isset($projectRow['frame_type']) ? strtolower(trim((string)$projectRow['frame_type'])) : '';
-                            $paperType = isset($projectRow['paper_type']) ? strtolower(trim((string)$projectRow['paper_type'])) : '';
-
-                            // Map sizes: A3 -> 6, A4 -> 7, A5 -> 8
-                            $sizeMap = ['a3' => 6, 'a4' => 7, 'a5' => 8];
-                            $sizeOptionId = $sizeMap[$size] ?? 7; // Fallback to A4 (7)
-
-                            // Map frame type: with frame -> 4, without frame -> 5
-                            $frameMap = ['with frame' => 4, 'without frame' => 5];
-                            $frameOptionId = $frameMap[$frameType] ?? 5; // Fallback to Without Frame (5)
-
-                            // Map paper type: art paper -> 9, canvas -> 10
-                            $paperMap = ['art paper' => 9, 'canvas' => 10];
-                            $paperOptionId = $paperMap[$paperType] ?? 9; // Fallback to Art Paper (9)
+                            $superAttributes = $this->superAttributeMapper->mapSuperAttributes(
+                                $projectRow['size'] ?? null,
+                                $projectRow['frame_type'] ?? null,
+                                $projectRow['paper_type'] ?? null
+                            );
 
                             $existingSuperAttribute = $result->getData('super_attribute') ?: [];
                             $superAttribute = is_array($existingSuperAttribute) ? $existingSuperAttribute : [];
 
-                            if (!isset($superAttribute[138]) && $sizeOptionId !== null) {
-                                $superAttribute[138] = $sizeOptionId;
-                            }
-                            if (!isset($superAttribute[137]) && $frameOptionId !== null) {
-                                $superAttribute[137] = $frameOptionId;
-                            }
-                            if (!isset($superAttribute[139]) && $paperOptionId !== null) {
-                                $superAttribute[139] = $paperOptionId;
+                            foreach ($superAttributes as $attrId => $optId) {
+                                if (!isset($superAttribute[$attrId])) {
+                                    $superAttribute[$attrId] = $optId;
+                                }
                             }
 
                             if (!empty($superAttribute)) {

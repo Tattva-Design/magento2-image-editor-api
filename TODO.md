@@ -59,7 +59,7 @@
   - Test order placement through checkout $\rightarrow$ verify `sales_order_item` stores `project_uuid` in database and admin.
 
 ### **Group 6: Code Cleanup, Redundancy Audit & File Optimization**
-- [ ] **Task 6.1: Audit & Consolidate BuyRequest Plugins**
+- [x] **Task 6.1: Audit & Consolidate BuyRequest Plugins**
   - Compare `Plugin/BuyRequestBuilderPlugin.php` and `Plugin/GraphQlBuyRequestBuilderPlugin.php`.
   - Extract duplicate super attribute mapping logic into a unified helper/service (`Model/Service/ProjectSuperAttributeMapper.php` or similar) to eliminate duplicate code.
 - [ ] **Task 6.2: Review & Clean Up Observer / Plugin Overlap**
@@ -70,7 +70,7 @@
   - Keep only the necessary mechanism to avoid duplicate assignments and clean up unused files.
 - [ ] **Task 6.4: Remove Unused DI Configurations & Events**
   - Audit `etc/di.xml` and `etc/events.xml` to delete any plugin or observer declarations associated with removed or consolidated files.
-- [ ] **Task 6.5: Clean Up Hardcoded Values & Magic Numbers**
+- [x] **Task 6.5: Clean Up Hardcoded Values & Magic Numbers**
   - Refactor static option IDs (`137`, `138`, `139`, `4`, `5`, `6`, etc.) in `BuyRequestBuilderPlugin` / `GraphQlBuyRequestBuilderPlugin` into class constants or configuration parameters for better maintainability.
 
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

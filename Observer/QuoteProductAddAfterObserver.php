@@ -7,11 +7,13 @@ namespace TattvaDesign\ImageEditorApi\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\App\ResourceConnection;
+use TattvaDesign\ImageEditorApi\Model\Service\ProjectSuperAttributeMapper;
 
 class QuoteProductAddAfterObserver implements ObserverInterface
 {
     public function __construct(
-        private readonly ResourceConnection $resourceConnection
+        private readonly ResourceConnection $resourceConnection,
+        private readonly ProjectSuperAttributeMapper $superAttributeMapper
     ) {
     }
 
@@ -37,9 +39,9 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                     $item->setData('project_uuid', $uuid);
 
                     $product = $item->getProduct();
-                    $productSku = $product ? $product->getSku() : '';
+                    $productSku = $product ? (string)$product->getSku() : '';
 
-                    if (str_starts_with($productSku, 'customisable-product') || str_starts_with($productSku, 'Customise product')) {
+                    if ($this->superAttributeMapper->isCustomisableProductSku($productSku)) {
                         // Fetch project details from database
                         try {
                             $select = $connection->select()
@@ -53,8 +55,22 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                                     $item->setName($projectRow['name']);
                                 }
 
-                                if ($productSku === 'customisable-product') {
-                                    // 2. Build and set custom SKU: customisable-product-size-frame-paper
+                                // 2. Propagate project_uuid and name to children for configurable items
+                                if ($item->getHasChildren()) {
+                                    foreach ($item->getChildren() as $child) {
+                                        $child->setData('project_uuid', $uuid);
+                                        if (!empty($projectRow['name'])) {
+                                            $child->setName($projectRow['name']);
+                                        }
+                                    }
+                                }
+
+                                // 3. Build dynamic SKU for standalone simple products
+                                $isConfigurable = ($item->getProductType() === 'configurable'
+                                    || ($product && $product->getTypeId() === 'configurable')
+                                    || $item->getHasChildren());
+
+                                if (!$isConfigurable) {
                                     $sku = 'customisable-product';
                                     if (!empty($projectRow['size'])) {
                                         $sku .= '-' . $projectRow['size'];
@@ -68,10 +84,12 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                                     // Clean spaces and make it standard format
                                     $sku = str_replace(' ', '-', $sku);
                                     $item->setSku($sku);
+                                }
 
-                                    // 3. Set custom price to 500 INR
-                                    $item->setCustomPrice(500.00);
-                                    $item->setOriginalCustomPrice(500.00);
+                                // 4. Set custom price to 500 INR
+                                $item->setCustomPrice(500.00);
+                                $item->setOriginalCustomPrice(500.00);
+                                if ($item->getProduct()) {
                                     $item->getProduct()->setIsSuperMode(true);
                                 }
                             }

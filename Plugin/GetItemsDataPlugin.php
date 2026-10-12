@@ -6,11 +6,13 @@ namespace TattvaDesign\ImageEditorApi\Plugin;
 
 use Magento\QuoteGraphQl\Model\CartItem\GetItemsData;
 use Magento\Framework\App\ResourceConnection;
+use TattvaDesign\ImageEditorApi\Model\Service\ProjectSuperAttributeMapper;
 
 class GetItemsDataPlugin
 {
     public function __construct(
-        private readonly ResourceConnection $resourceConnection
+        private readonly ResourceConnection $resourceConnection,
+        private readonly ProjectSuperAttributeMapper $superAttributeMapper
     ) {
     }
 
@@ -34,12 +36,12 @@ class GetItemsDataPlugin
                 if ($projectUuid) {
                     $itemData['project_uuid'] = $projectUuid;
                     $product = $cartItem->getProduct();
-                    $productSku = $product ? $product->getSku() : '';
+                    $productSku = $product ? (string)$product->getSku() : '';
 
-                    if (str_starts_with($productSku, 'customisable-product') || str_starts_with($productSku, 'Customise product')) {
+                    if ($this->superAttributeMapper->isCustomisableProductSku($productSku)) {
                         if (isset($itemData['product']) && is_array($itemData['product'])) {
                             $customSku = $cartItem->getOrigData('sku') ?: ($cartItem->getData('sku') ?: $cartItem->getSku());
-                            
+
                             // Query the project name from tattva_image_editor_project database table
                             $customName = null;
                             try {
@@ -55,14 +57,17 @@ class GetItemsDataPlugin
                                 $customName = $cartItem->getOrigData('name') ?: ($cartItem->getData('name') ?: $cartItem->getName());
                             }
 
-                            if ($productSku === 'customisable-product') {
+                            $isConfigurable = ($cartItem->getProductType() === 'configurable'
+                                || ($product && $product->getTypeId() === 'configurable'));
+
+                            if (!$isConfigurable) {
                                 $itemData['product']['sku'] = $customSku;
                             }
                             $itemData['product']['name'] = $customName;
-                            
+
                             if (isset($itemData['product']['model']) && $itemData['product']['model'] instanceof \Magento\Catalog\Model\Product) {
                                 $clonedProduct = clone $itemData['product']['model'];
-                                if ($productSku === 'customisable-product') {
+                                if (!$isConfigurable) {
                                     $clonedProduct->setSku($customSku);
                                 }
                                 $clonedProduct->setName($customName);
