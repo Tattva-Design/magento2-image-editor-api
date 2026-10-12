@@ -12,69 +12,53 @@ class GetItemsDataPlugin
 {
     public function __construct(
         private readonly ResourceConnection $resourceConnection,
-        private readonly ProjectSuperAttributeMapper $superAttributeMapper
+        private readonly ProjectSuperAttributeMapper $mapper
     ) {
     }
 
     /**
-     * Override product name and SKU in GraphQL response with the custom quote item values.
-     *
-     * @param GetItemsData $subject
-     * @param array $result
-     * @param array $cartItems
-     * @return array
+     * Override product name and SKU in GraphQL response with custom project values.
      */
     public function afterExecute(GetItemsData $subject, array $result, array $cartItems): array
     {
         $connection = $this->resourceConnection->getConnection();
-        $tableName = $this->resourceConnection->getTableName('tattva_image_editor_project');
+        $table = $this->resourceConnection->getTableName('tattva_image_editor_project');
 
         foreach ($result as $index => &$itemData) {
-            if (is_array($itemData) && isset($cartItems[$index])) {
-                $cartItem = $cartItems[$index];
-                $projectUuid = $cartItem->getData('project_uuid');
-                if ($projectUuid) {
-                    $itemData['project_uuid'] = $projectUuid;
-                    $product = $cartItem->getProduct();
-                    $productSku = $product ? (string)$product->getSku() : '';
+            $cartItem = $cartItems[$index] ?? null;
+            $uuid = $cartItem?->getData('project_uuid');
+            $sku = (string)($cartItem?->getProduct()?->getSku() ?? '');
 
-                    if ($this->superAttributeMapper->isCustomisableProductSku($productSku)) {
-                        if (isset($itemData['product']) && is_array($itemData['product'])) {
-                            $customSku = $cartItem->getOrigData('sku') ?: ($cartItem->getData('sku') ?: $cartItem->getSku());
+            if (!$uuid || !is_array($itemData) || !$this->mapper->isCustomisable($sku)) {
+                continue;
+            }
 
-                            // Query the project name from tattva_image_editor_project database table
-                            $customName = null;
-                            try {
-                                $select = $connection->select()
-                                    ->from($tableName, ['name'])
-                                    ->where('uuid = ?', $projectUuid);
-                                $customName = $connection->fetchOne($select);
-                            } catch (\Throwable $e) {
-                                // Fallback in case of database errors
-                            }
+            $itemData['project_uuid'] = $uuid;
 
-                            if (!$customName) {
-                                $customName = $cartItem->getOrigData('name') ?: ($cartItem->getData('name') ?: $cartItem->getName());
-                            }
+            try {
+                $name = $connection->fetchOne(
+                    $connection->select()->from($table, ['name'])->where('uuid = ?', $uuid)
+                );
+            } catch (\Throwable) {
+                $name = null;
+            }
 
-                            $isConfigurable = ($cartItem->getProductType() === 'configurable'
-                                || ($product && $product->getTypeId() === 'configurable'));
+            $name = $name ?: ($cartItem->getName() ?: ($itemData['product']['name'] ?? ''));
+            $isConfigurable = ($cartItem->getProductType() === 'configurable');
 
-                            if (!$isConfigurable) {
-                                $itemData['product']['sku'] = $customSku;
-                            }
-                            $itemData['product']['name'] = $customName;
+            if (isset($itemData['product']) && is_array($itemData['product'])) {
+                if (!$isConfigurable) {
+                    $itemData['product']['sku'] = $cartItem->getSku();
+                }
+                $itemData['product']['name'] = $name;
 
-                            if (isset($itemData['product']['model']) && $itemData['product']['model'] instanceof \Magento\Catalog\Model\Product) {
-                                $clonedProduct = clone $itemData['product']['model'];
-                                if (!$isConfigurable) {
-                                    $clonedProduct->setSku($customSku);
-                                }
-                                $clonedProduct->setName($customName);
-                                $itemData['product']['model'] = $clonedProduct;
-                            }
-                        }
+                if (isset($itemData['product']['model']) && $itemData['product']['model'] instanceof \Magento\Catalog\Model\Product) {
+                    $cloned = clone $itemData['product']['model'];
+                    if (!$isConfigurable) {
+                        $cloned->setSku($cartItem->getSku());
                     }
+                    $cloned->setName($name);
+                    $itemData['product']['model'] = $cloned;
                 }
             }
         }
