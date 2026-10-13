@@ -57,6 +57,9 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                             if (!empty($project['name'])) {
                                 $child->setName($project['name']);
                             }
+                            $child->setCustomPrice(500.00);
+                            $child->setOriginalCustomPrice(500.00);
+                            $child->getProduct()?->setIsSuperMode(true);
                         }
                     }
 

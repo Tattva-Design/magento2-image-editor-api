@@ -24,7 +24,7 @@
           "mode": "graphql",
           "graphql": {
             "query": "mutation CreateImageEditorProject($input: CreateImageEditorProjectInput!) {\n  createImageEditorProject(input: $input) {\n    id\n    uuid\n    customerId\n    storeId\n    name\n    description\n    size\n    width\n    height\n    status\n    productSku\n    frameType\n    paperType\n    canvasObject\n    thumbnailUrl\n    createdAt\n    updatedAt\n  }\n}",
-            "variables": "{\n  \"input\": {\n    \"name\": \"My Custom Canvas\",\n    \"description\": \"A custom sized project\",\n    \"size\": \"A4\",\n    \"width\": 1200,\n    \"height\": 800,\n    \"productSku\": \"Customise product\",\n    \"frameType\": \"with frame\",\n    \"paperType\": \"canvas\"\n  }\n}"
+            "variables": "{\n  \"input\": {\n    \"name\": \"My Custom Canvas\",\n    \"description\": \"A custom sized project\",\n    \"size\": \"A4\",\n    \"width\": 1200,\n    \"height\": 800,\n    \"productSku\": \"customisable-product\",\n    \"frameType\": \"with frame\",\n    \"paperType\": \"canvas\"\n  }\n}"
           }
         },
         "url": {
@@ -54,7 +54,7 @@
           "mode": "graphql",
           "graphql": {
             "query": "mutation UpdateImageEditorProject($input: UpdateImageEditorProjectInput!) {\n  updateImageEditorProject(input: $input) {\n    id\n    uuid\n    customerId\n    storeId\n    name\n    description\n    size\n    width\n    height\n    status\n    productSku\n    frameType\n    paperType\n    canvasObject\n    thumbnailUrl\n    createdAt\n    updatedAt\n  }\n}",
-            "variables": "{\n  \"input\": {\n    \"uuid\": \"INSERT_PROJECT_UUID_HERE\",\n    \"name\": \"Updated Canvas Name\",\n    \"description\": \"An updated description\",\n    \"size\": \"A4\",\n    \"width\": 1600,\n    \"height\": 1200,\n    \"status\": \"in_cart\",\n    \"productSku\": \"Customise product\",\n    \"frameType\": \"without frame\",\n    \"paperType\": \"art paper\"\n  }\n}"
+            "variables": "{\n  \"input\": {\n    \"uuid\": \"INSERT_PROJECT_UUID_HERE\",\n    \"name\": \"Updated Canvas Name\",\n    \"description\": \"An updated description\",\n    \"size\": \"A4\",\n    \"width\": 1600,\n    \"height\": 1200,\n    \"status\": \"in_cart\",\n    \"productSku\": \"customisable-product\",\n    \"frameType\": \"without frame\",\n    \"paperType\": \"art paper\"\n  }\n}"
           }
         },
         "url": {
@@ -200,7 +200,7 @@
           "mode": "graphql",
           "graphql": {
             "query": "mutation AddProductsToCart($cartId: String!, $cartItems: [CartItemInput!]!) {\n  addProductsToCart(cartId: $cartId, cartItems: $cartItems) {\n    cart {\n      id\n      items {\n        id\n        quantity\n        project_uuid\n        ... on SimpleCartItem {\n          project_thumbnail_url\n        }\n        ... on ConfigurableCartItem {\n          project_thumbnail_url\n          configurable_options {\n            id\n            option_label\n            value_id\n            value_label\n          }\n        }\n        product {\n          sku\n          name\n        }\n        prices {\n          price {\n            value\n            currency\n          }\n        }\n      }\n    }\n  }\n}",
-            "variables": "{\n  \"cartId\": \"INSERT_CART_ID_HERE\",\n  \"cartItems\": [\n    {\n      \"sku\": \"Customise product\",\n      \"quantity\": 1,\n      \"project_uuid\": \"INSERT_PROJECT_UUID_HERE\"\n    }\n  ]\n}"
+            "variables": "{\n  \"cartId\": \"INSERT_CART_ID_HERE\",\n  \"cartItems\": [\n    {\n      \"sku\": \"customisable-product\",\n      \"quantity\": 1,\n      \"project_uuid\": \"INSERT_PROJECT_UUID_HERE\"\n    }\n  ]\n}"
           }
         },
         "url": {
