@@ -27,7 +27,7 @@ class GetItemsDataPlugin
         foreach ($result as $index => &$itemData) {
             $cartItem = $cartItems[$index] ?? null;
             $uuid = $cartItem?->getData('project_uuid');
-            $sku = (string)($cartItem?->getProduct()?->getSku() ?? '');
+            $sku = (string)($cartItem?->getProduct()?->getSku() ?: $cartItem?->getSku());
 
             if (!$uuid || !is_array($itemData) || !$this->mapper->isCustomisable($sku)) {
                 continue;
@@ -44,7 +44,9 @@ class GetItemsDataPlugin
             }
 
             $name = $name ?: ($cartItem->getName() ?: ($itemData['product']['name'] ?? ''));
-            $isConfigurable = ($cartItem->getProductType() === 'configurable');
+            $isConfigurable = ($cartItem->getProductType() === 'configurable'
+                || ($cartItem->getProduct() && $cartItem->getProduct()->getTypeId() === 'configurable')
+                || $cartItem->getHasChildren());
 
             if (isset($itemData['product']) && is_array($itemData['product'])) {
                 if (!$isConfigurable) {

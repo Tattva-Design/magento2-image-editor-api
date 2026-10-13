@@ -36,7 +36,7 @@ class QuoteProductAddAfterObserver implements ObserverInterface
             }
 
             $item->setData('project_uuid', $uuid);
-            $sku = (string)($item->getProduct()?->getSku() ?? '');
+            $sku = (string)($item->getProduct()?->getSku() ?: $item->getSku());
 
             if (!$this->mapper->isCustomisable($sku)) {
                 continue;
@@ -60,7 +60,9 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                         }
                     }
 
-                    $isConfigurable = ($item->getProductType() === 'configurable' || $item->getHasChildren());
+                    $isConfigurable = ($item->getProductType() === 'configurable'
+                        || ($item->getProduct() && $item->getProduct()->getTypeId() === 'configurable')
+                        || $item->getHasChildren());
                     if (!$isConfigurable) {
                         $parts = array_filter(['customisable-product', $project['size'] ?? '', $project['frame_type'] ?? '', $project['paper_type'] ?? '']);
                         $item->setSku(str_replace(' ', '-', implode('-', $parts)));

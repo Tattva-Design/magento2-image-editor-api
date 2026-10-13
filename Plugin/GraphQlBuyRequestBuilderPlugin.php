@@ -32,7 +32,9 @@ class GraphQlBuyRequestBuilderPlugin
             $result->setData('project_uuid', $uuid);
 
             if ($this->mapper->isCustomisable($sku)) {
-                $super = array_replace($this->mapper->getSuperAttributes($uuid), (array)($result->getData('super_attribute') ?: []));
+                $projectSuper = $this->mapper->getSuperAttributes($uuid);
+                $existingSuper = (array)($result->getData('super_attribute') ?: []);
+                $super = array_replace($existingSuper, array_filter($projectSuper));
                 if (!empty($super)) {
                     $result->setData('super_attribute', $super);
                 }
