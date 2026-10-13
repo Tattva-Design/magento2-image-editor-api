@@ -7,18 +7,20 @@ namespace TattvaDesign\ImageEditorApi\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\App\ResourceConnection;
+use TattvaDesign\ImageEditorApi\Model\Registry\CartProjectRegistry;
 use TattvaDesign\ImageEditorApi\Model\Service\ProjectSuperAttributeMapper;
 
 class QuoteProductAddAfterObserver implements ObserverInterface
 {
     public function __construct(
         private readonly ResourceConnection $resourceConnection,
-        private readonly ProjectSuperAttributeMapper $mapper
+        private readonly ProjectSuperAttributeMapper $mapper,
+        private readonly CartProjectRegistry $registry
     ) {
     }
 
     /**
-     * Set project_uuid, project name, custom SKU and custom price to the quote item.
+     * Set project_uuid, project name and custom price to the quote item.
      */
     public function execute(Observer $observer): void
     {
@@ -31,12 +33,17 @@ class QuoteProductAddAfterObserver implements ObserverInterface
             $data = $buyRequest ? json_decode((string)$buyRequest->getValue(), true) : null;
             $uuid = is_array($data) ? trim((string)($data['project_uuid'] ?? '')) : '';
 
+            $sku = (string)($item->getProduct()?->getSku() ?: $item->getSku());
+
+            if (!$uuid) {
+                $uuid = (string)($this->registry->get($sku) ?: '');
+            }
+
             if (!$uuid) {
                 continue;
             }
 
             $item->setData('project_uuid', $uuid);
-            $sku = (string)($item->getProduct()?->getSku() ?: $item->getSku());
 
             if (!$this->mapper->isCustomisable($sku)) {
                 continue;
@@ -61,14 +68,6 @@ class QuoteProductAddAfterObserver implements ObserverInterface
                             $child->setOriginalCustomPrice(500.00);
                             $child->getProduct()?->setIsSuperMode(true);
                         }
-                    }
-
-                    $isConfigurable = ($item->getProductType() === 'configurable'
-                        || ($item->getProduct() && $item->getProduct()->getTypeId() === 'configurable')
-                        || $item->getHasChildren());
-                    if (!$isConfigurable) {
-                        $parts = array_filter(['customisable-product', $project['size'] ?? '', $project['frame_type'] ?? '', $project['paper_type'] ?? '']);
-                        $item->setSku(str_replace(' ', '-', implode('-', $parts)));
                     }
 
                     $item->setCustomPrice(500.00);

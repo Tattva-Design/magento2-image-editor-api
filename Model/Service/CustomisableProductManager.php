@@ -125,6 +125,8 @@ class CustomisableProductManager
 
         // 4. Create / update all 12 child simple variations
         $childProductIds = [];
+        $productIntTable = $this->resourceConnection->getTableName('catalog_product_entity_int');
+
         foreach ($sizeResolvedOptions as $sizeKey => $sizeData) {
             foreach ($frameResolvedOptions as $frameKey => $frameData) {
                 foreach ($paperResolvedOptions as $paperKey => $paperData) {
@@ -157,7 +159,13 @@ class CustomisableProductManager
 
                     $child->setPrice(self::DEFAULT_PRICE)
                         ->setWeight(self::DEFAULT_WEIGHT)
-                        ->setStatus(Status::STATUS_ENABLED);
+                        ->setStatus(Status::STATUS_ENABLED)
+                        ->setStockData([
+                            'use_config_manage_stock' => 0,
+                            'manage_stock' => 0,
+                            'is_in_stock' => 1,
+                            'qty' => 99999
+                        ]);
 
                     $child->setData($sizeAttr['code'], $sizeData['option_id']);
                     $child->setData($frameAttr['code'], $frameData['option_id']);
@@ -166,6 +174,22 @@ class CustomisableProductManager
                     $child = $this->productRepository->save($child);
                     $childId = (int)$child->getId();
                     $childProductIds[] = $childId;
+
+                    // Ensure attribute integer values are populated directly in catalog_product_entity_int
+                    if ($connection->isTableExists($productIntTable)) {
+                        foreach ([
+                            $sizeAttr['id'] => $sizeData['option_id'],
+                            $frameAttr['id'] => $frameData['option_id'],
+                            $paperAttr['id'] => $paperData['option_id']
+                        ] as $aId => $oId) {
+                            $connection->insertOnDuplicate($productIntTable, [
+                                'attribute_id' => $aId,
+                                'store_id' => 0,
+                                'entity_id' => $childId,
+                                'value' => $oId
+                            ], ['value']);
+                        }
+                    }
 
                     $this->populateStock($childId, $childSku, $websiteIds);
                 }
@@ -179,18 +203,34 @@ class CustomisableProductManager
                 ->setSku(self::SKU)
                 ->setName(self::PRODUCT_NAME)
                 ->setAttributeSetId($defaultAttributeSetId)
-                ->setVisibility(Visibility::VISIBILITY_NOT_VISIBLE)
+                ->setVisibility(Visibility::VISIBILITY_BOTH)
                 ->setWebsiteIds($websiteIds);
         } else {
             $configurableProduct = $existingProduct;
+            $configurableProduct->setTypeId(Configurable::TYPE_CODE)
+                ->setName(self::PRODUCT_NAME)
+                ->setVisibility(Visibility::VISIBILITY_BOTH);
         }
 
         $configurableProduct->setPrice(self::DEFAULT_PRICE)
             ->setWeight(self::DEFAULT_WEIGHT)
-            ->setStatus(Status::STATUS_ENABLED);
+            ->setStatus(Status::STATUS_ENABLED)
+            ->setStockData([
+                'use_config_manage_stock' => 0,
+                'manage_stock' => 0,
+                'is_in_stock' => 1,
+                'qty' => 99999
+            ]);
 
         $configurableProduct = $this->productRepository->save($configurableProduct);
         $parentId = (int)$configurableProduct->getId();
+
+        // Ensure type_id is configurable in catalog_product_entity table directly
+        $connection->update(
+            $this->resourceConnection->getTableName('catalog_product_entity'),
+            ['type_id' => Configurable::TYPE_CODE],
+            ['entity_id = ?' => $parentId]
+        );
 
         $this->populateStock($parentId, self::SKU, $websiteIds);
 
@@ -275,10 +315,14 @@ class CustomisableProductManager
         $catalogEavTable = $this->resourceConnection->getTableName('catalog_eav_attribute');
         $eavEntityAttrTable = $this->resourceConnection->getTableName('eav_entity_attribute');
 
+        $attrCond = $connection->quoteInto('attribute_id = ?', $fallbackId)
+            . ' OR '
+            . $connection->quoteInto('attribute_code IN (?)', $aliases);
+
         $select = $connection->select()
             ->from($eavAttrTable, ['attribute_id', 'attribute_code', 'frontend_label'])
             ->where('entity_type_id = ?', 4)
-            ->where('attribute_id = ? OR attribute_code IN (?)', $fallbackId, $aliases)
+            ->where($attrCond)
             ->limit(1);
 
         $row = $connection->fetchRow($select);
@@ -348,12 +392,16 @@ class CustomisableProductManager
         $optionTable = $this->resourceConnection->getTableName('eav_attribute_option');
         $optionValTable = $this->resourceConnection->getTableName('eav_attribute_option_value');
 
+        $optCond = $connection->quoteInto('LOWER(TRIM(v.value)) = ?', strtolower(trim($label)))
+            . ' OR '
+            . $connection->quoteInto('o.option_id = ?', $fallbackOptionId);
+
         // Look for existing option matching label or fallback ID
         $select = $connection->select()
             ->from(['o' => $optionTable], ['o.option_id'])
             ->joinLeft(['v' => $optionValTable], 'o.option_id = v.option_id', [])
             ->where('o.attribute_id = ?', $attrId)
-            ->where('LOWER(TRIM(v.value)) = ? OR o.option_id = ?', strtolower(trim($label)), $fallbackOptionId)
+            ->where($optCond)
             ->limit(1);
 
         $optionId = $connection->fetchOne($select);

@@ -27,7 +27,7 @@ class BuyRequestBuilderPlugin
         CartItem $cartItem
     ): DataObject {
         $sku = trim((string)$cartItem->getSku());
-        if ($sku !== '' && ($uuid = $this->registry->getAndRemove($sku))) {
+        if ($sku !== '' && ($uuid = $this->registry->get($sku))) {
             $result->setData('project_uuid', $uuid);
 
             if ($this->mapper->isCustomisable($sku)) {

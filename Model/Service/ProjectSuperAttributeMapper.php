@@ -95,11 +95,15 @@ class ProjectSuperAttributeMapper
             $connection = $this->resourceConnection->getConnection();
             $eavAttrTable = $this->resourceConnection->getTableName('eav_attribute');
 
-            // Find attributes
+            // Find attributes using quoteInto for compound condition
+            $attrCond = $connection->quoteInto('attribute_id IN (?)', [137, 138, 139])
+                . ' OR '
+                . $connection->quoteInto('attribute_code IN (?)', ['size', 'frame_type', 'paper_type', 'frame', 'paper']);
+
             $select = $connection->select()
                 ->from($eavAttrTable, ['attribute_id', 'attribute_code'])
                 ->where('entity_type_id = ?', 4)
-                ->where('attribute_id IN (?) OR attribute_code IN (?)', [137, 138, 139], ['size', 'frame_type', 'paper_type', 'frame', 'paper']);
+                ->where($attrCond);
             $attrRows = $connection->fetchAll($select);
 
             foreach ($attrRows as $attr) {
@@ -119,37 +123,39 @@ class ProjectSuperAttributeMapper
             $optionTable = $this->resourceConnection->getTableName('eav_attribute_option');
             $optionValTable = $this->resourceConnection->getTableName('eav_attribute_option_value');
 
-            $allAttrIds = array_values($config['attrs']);
-            $selectOpts = $connection->select()
-                ->from(['o' => $optionTable], ['o.attribute_id', 'o.option_id'])
-                ->join(['v' => $optionValTable], 'o.option_id = v.option_id', ['val' => 'LOWER(TRIM(v.value))'])
-                ->where('o.attribute_id IN (?)', $allAttrIds);
-            $optRows = $connection->fetchAll($selectOpts);
+            $allAttrIds = array_values(array_unique($config['attrs']));
+            if (!empty($allAttrIds)) {
+                $selectOpts = $connection->select()
+                    ->from(['o' => $optionTable], ['o.attribute_id', 'o.option_id'])
+                    ->join(['v' => $optionValTable], 'o.option_id = v.option_id', ['val' => 'LOWER(TRIM(v.value))'])
+                    ->where('o.attribute_id IN (?)', $allAttrIds);
+                $optRows = $connection->fetchAll($selectOpts);
 
-            foreach ($optRows as $opt) {
-                $attrId = (int)$opt['attribute_id'];
-                $optId = (int)$opt['option_id'];
-                $val = (string)$opt['val'];
+                foreach ($optRows as $opt) {
+                    $attrId = (int)$opt['attribute_id'];
+                    $optId = (int)$opt['option_id'];
+                    $val = (string)$opt['val'];
 
-                if ($attrId === $config['attrs']['size']) {
-                    if (str_contains($val, 'a3')) {
-                        $config['options']['size']['a3'] = $optId;
-                    } elseif (str_contains($val, 'a4')) {
-                        $config['options']['size']['a4'] = $optId;
-                    } elseif (str_contains($val, 'a5')) {
-                        $config['options']['size']['a5'] = $optId;
-                    }
-                } elseif ($attrId === $config['attrs']['frame']) {
-                    if (str_contains($val, 'without')) {
-                        $config['options']['frame']['without frame'] = $optId;
-                    } elseif (str_contains($val, 'with')) {
-                        $config['options']['frame']['with frame'] = $optId;
-                    }
-                } elseif ($attrId === $config['attrs']['paper']) {
-                    if (str_contains($val, 'art')) {
-                        $config['options']['paper']['art paper'] = $optId;
-                    } elseif (str_contains($val, 'canvas')) {
-                        $config['options']['paper']['canvas'] = $optId;
+                    if ($attrId === $config['attrs']['size']) {
+                        if (str_contains($val, 'a3')) {
+                            $config['options']['size']['a3'] = $optId;
+                        } elseif (str_contains($val, 'a4')) {
+                            $config['options']['size']['a4'] = $optId;
+                        } elseif (str_contains($val, 'a5')) {
+                            $config['options']['size']['a5'] = $optId;
+                        }
+                    } elseif ($attrId === $config['attrs']['frame']) {
+                        if (str_contains($val, 'without')) {
+                            $config['options']['frame']['without frame'] = $optId;
+                        } elseif (str_contains($val, 'with')) {
+                            $config['options']['frame']['with frame'] = $optId;
+                        }
+                    } elseif ($attrId === $config['attrs']['paper']) {
+                        if (str_contains($val, 'art')) {
+                            $config['options']['paper']['art paper'] = $optId;
+                        } elseif (str_contains($val, 'canvas')) {
+                            $config['options']['paper']['canvas'] = $optId;
+                        }
                     }
                 }
             }

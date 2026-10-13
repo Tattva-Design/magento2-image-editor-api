@@ -26,7 +26,7 @@ class GraphQlBuyRequestBuilderPlugin
         array $cartItemData
     ): DataObject {
         $sku = trim((string)($cartItemData['sku'] ?? ''));
-        $uuid = trim((string)($cartItemData['project_uuid'] ?? '')) ?: ($sku ? $this->registry->getAndRemove($sku) : null);
+        $uuid = trim((string)($cartItemData['project_uuid'] ?? '')) ?: ($sku ? $this->registry->get($sku) : null);
 
         if ($sku !== '' && $uuid) {
             $result->setData('project_uuid', $uuid);
