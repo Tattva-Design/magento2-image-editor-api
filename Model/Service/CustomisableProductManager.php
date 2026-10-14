@@ -179,17 +179,22 @@ class CustomisableProductManager
 
                     // Ensure attribute integer values are populated directly in catalog_product_entity_int
                     if ($connection->isTableExists($productIntTable)) {
-                        foreach ([
-                            $sizeAttr['id'] => $sizeData['option_id'],
-                            $frameAttr['id'] => $frameData['option_id'],
-                            $paperAttr['id'] => $paperData['option_id']
-                        ] as $aId => $oId) {
-                            $connection->insertOnDuplicate($productIntTable, [
-                                'attribute_id' => $aId,
-                                'store_id' => 0,
-                                'entity_id' => $childId,
-                                'value' => $oId
-                            ], ['value']);
+                        try {
+                            $intCols = array_keys($connection->describeTable($productIntTable));
+                            $entityCol = (in_array('row_id', $intCols, true) && !in_array('entity_id', $intCols, true)) ? 'row_id' : 'entity_id';
+                            foreach ([
+                                $sizeAttr['id'] => $sizeData['option_id'],
+                                $frameAttr['id'] => $frameData['option_id'],
+                                $paperAttr['id'] => $paperData['option_id']
+                            ] as $aId => $oId) {
+                                $connection->insertOnDuplicate($productIntTable, [
+                                    'attribute_id' => $aId,
+                                    'store_id' => 0,
+                                    $entityCol => $childId,
+                                    'value' => $oId
+                                ], ['value']);
+                            }
+                        } catch (\Throwable) {
                         }
                     }
 
@@ -228,11 +233,17 @@ class CustomisableProductManager
         $parentId = (int)$configurableProduct->getId();
 
         // Ensure type_id is configurable in catalog_product_entity table directly
-        $connection->update(
-            $this->resourceConnection->getTableName('catalog_product_entity'),
-            ['type_id' => Configurable::TYPE_CODE],
-            ['entity_id = ?' => $parentId]
-        );
+        try {
+            $prodTable = $this->resourceConnection->getTableName('catalog_product_entity');
+            $prodCols = array_keys($connection->describeTable($prodTable));
+            $pkCol = (in_array('row_id', $prodCols, true) && !in_array('entity_id', $prodCols, true)) ? 'row_id' : 'entity_id';
+            $connection->update(
+                $prodTable,
+                ['type_id' => Configurable::TYPE_CODE],
+                [$pkCol . ' = ?' => $parentId]
+            );
+        } catch (\Throwable) {
+        }
 
         $this->populateStock($parentId, self::SKU, $websiteIds);
 
@@ -246,25 +257,28 @@ class CustomisableProductManager
         ];
 
         foreach ($configurableAttrs as $position => $attrData) {
-            $connection->insertOnDuplicate($superAttrTable, [
-                'product_id' => $parentId,
-                'attribute_id' => $attrData['id'],
-                'position' => $position
-            ], ['position']);
+            try {
+                $connection->insertOnDuplicate($superAttrTable, [
+                    'product_id' => $parentId,
+                    'attribute_id' => $attrData['id'],
+                    'position' => $position
+                ], ['position']);
 
-            $psaId = (int)$connection->fetchOne(
-                $connection->select()->from($superAttrTable, ['product_super_attribute_id'])
-                    ->where('product_id = ?', $parentId)
-                    ->where('attribute_id = ?', $attrData['id'])
-            );
+                $psaId = (int)$connection->fetchOne(
+                    $connection->select()->from($superAttrTable, ['product_super_attribute_id'])
+                        ->where('product_id = ?', $parentId)
+                        ->where('attribute_id = ?', $attrData['id'])
+                );
 
-            if ($psaId) {
-                $connection->insertOnDuplicate($superAttrLabelTable, [
-                    'product_super_attribute_id' => $psaId,
-                    'store_id' => 0,
-                    'use_default' => 1,
-                    'value' => $attrData['label']
-                ], ['value', 'use_default']);
+                if ($psaId) {
+                    $connection->insertOnDuplicate($superAttrLabelTable, [
+                        'product_super_attribute_id' => $psaId,
+                        'store_id' => 0,
+                        'use_default' => 1,
+                        'value' => $attrData['label']
+                    ], ['value', 'use_default']);
+                }
+            } catch (\Throwable) {
             }
         }
 
@@ -273,15 +287,18 @@ class CustomisableProductManager
         $relationTable = $this->resourceConnection->getTableName('catalog_product_relation');
 
         foreach ($childProductIds as $childId) {
-            $connection->insertOnDuplicate($superLinkTable, [
-                'product_id' => $childId,
-                'parent_id' => $parentId
-            ]);
+            try {
+                $connection->insertOnDuplicate($superLinkTable, [
+                    'product_id' => $childId,
+                    'parent_id' => $parentId
+                ]);
 
-            $connection->insertOnDuplicate($relationTable, [
-                'parent_id' => $parentId,
-                'child_id' => $childId
-            ]);
+                $connection->insertOnDuplicate($relationTable, [
+                    'parent_id' => $parentId,
+                    'child_id' => $childId
+                ]);
+            } catch (\Throwable) {
+            }
         }
 
         // 8. Try to sync via TypeInstance if possible
@@ -350,35 +367,46 @@ class CustomisableProductManager
             $label = $defaultLabel;
         }
 
-        // Ensure catalog_eav_attribute has is_configurable = 1 and is_global = 1
+        // Ensure catalog_eav_attribute settings (global scope, visible, product listing)
         if ($connection->isTableExists($catalogEavTable)) {
-            $connection->insertOnDuplicate($catalogEavTable, [
-                'attribute_id' => $attrId,
-                'is_global' => 1,
-                'is_configurable' => 1,
-                'is_visible' => 1,
-                'used_in_product_listing' => 1
-            ], ['is_global', 'is_configurable', 'is_visible', 'used_in_product_listing']);
+            try {
+                $tableCols = array_keys($connection->describeTable($catalogEavTable));
+                $catalogData = [
+                    'attribute_id' => $attrId,
+                    'is_global' => 1,
+                    'is_visible' => 1,
+                    'used_in_product_listing' => 1
+                ];
+                $filteredData = array_intersect_key($catalogData, array_flip($tableCols));
+                $updateCols = array_values(array_diff(array_keys($filteredData), ['attribute_id']));
+                if (!empty($updateCols)) {
+                    $connection->insertOnDuplicate($catalogEavTable, $filteredData, $updateCols);
+                }
+            } catch (\Throwable) {
+            }
         }
 
         // Ensure assigned to the default attribute set
         if ($connection->isTableExists($eavEntityAttrTable)) {
-            $groupTable = $this->resourceConnection->getTableName('eav_attribute_group');
-            $groupId = (int)$connection->fetchOne(
-                $connection->select()->from($groupTable, ['attribute_group_id'])
-                    ->where('attribute_set_id = ?', $attributeSetId)
-                    ->order('sort_order ASC')
-                    ->limit(1)
-            );
+            try {
+                $groupTable = $this->resourceConnection->getTableName('eav_attribute_group');
+                $groupId = (int)$connection->fetchOne(
+                    $connection->select()->from($groupTable, ['attribute_group_id'])
+                        ->where('attribute_set_id = ?', $attributeSetId)
+                        ->order('sort_order ASC')
+                        ->limit(1)
+                );
 
-            if ($groupId) {
-                $connection->insertOnDuplicate($eavEntityAttrTable, [
-                    'entity_type_id' => 4,
-                    'attribute_set_id' => $attributeSetId,
-                    'attribute_group_id' => $groupId,
-                    'attribute_id' => $attrId,
-                    'sort_order' => 100
-                ]);
+                if ($groupId) {
+                    $connection->insertOnDuplicate($eavEntityAttrTable, [
+                        'entity_type_id' => 4,
+                        'attribute_set_id' => $attributeSetId,
+                        'attribute_group_id' => $groupId,
+                        'attribute_id' => $attrId,
+                        'sort_order' => 100
+                    ]);
+                }
+            } catch (\Throwable) {
             }
         }
 
@@ -412,19 +440,23 @@ class CustomisableProductManager
         }
 
         // Create option
-        $connection->insert($optionTable, [
-            'attribute_id' => $attrId,
-            'sort_order' => $sortOrder
-        ]);
-        $newOptionId = (int)$connection->lastInsertId($optionTable);
+        try {
+            $connection->insert($optionTable, [
+                'attribute_id' => $attrId,
+                'sort_order' => $sortOrder
+            ]);
+            $newOptionId = (int)$connection->lastInsertId($optionTable);
 
-        $connection->insertOnDuplicate($optionValTable, [
-            'option_id' => $newOptionId,
-            'store_id' => 0,
-            'value' => $label
-        ]);
+            $connection->insertOnDuplicate($optionValTable, [
+                'option_id' => $newOptionId,
+                'store_id' => 0,
+                'value' => $label
+            ]);
 
-        return $newOptionId;
+            return $newOptionId;
+        } catch (\Throwable) {
+            return $fallbackOptionId;
+        }
     }
 
     /**
