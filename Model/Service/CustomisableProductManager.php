@@ -547,6 +547,37 @@ class CustomisableProductManager
             $connection->select()->from($productTable, ['sku', 'entity_id'])->where('sku IN (?)', $allSkus)
         );
 
+        // Immediate cleanup of existing duplicate stock status/item rows across all 13 products
+        // to prevent "Item (Magento\CatalogInventory\Model\Stock\Status) with the same ID already exists"
+        $allProductIds = array_values(array_filter(array_map('intval', $skuToId)));
+        if (!empty($allProductIds)) {
+            $stockStatusTable = $this->resourceConnection->getTableName('cataloginventory_stock_status');
+            if ($connection->isTableExists($stockStatusTable)) {
+                try {
+                    $connection->delete($stockStatusTable, [
+                        'product_id IN (?)' => $allProductIds,
+                        'website_id != ?' => 0
+                    ]);
+                    $connection->delete($stockStatusTable, [
+                        'product_id IN (?)' => $allProductIds,
+                        'stock_id != ?' => 1
+                    ]);
+                } catch (\Throwable) {
+                }
+            }
+
+            $stockItemTable = $this->resourceConnection->getTableName('cataloginventory_stock_item');
+            if ($connection->isTableExists($stockItemTable)) {
+                try {
+                    $connection->delete($stockItemTable, [
+                        'product_id IN (?)' => $allProductIds,
+                        'stock_id != ?' => 1
+                    ]);
+                } catch (\Throwable) {
+                }
+            }
+        }
+
         foreach ($allSkus as $sku) {
             $prodId = isset($skuToId[$sku]) ? (int)$skuToId[$sku] : 0;
             if ($prodId > 0) {
@@ -684,41 +715,50 @@ class CustomisableProductManager
             }
         }
 
-        // 7. Populate legacy cataloginventory_stock_item table for all stocks
+        // 7. Populate legacy cataloginventory_stock_item table (exactly ONE row: stock_id = 1)
         $stockItemTable = $this->resourceConnection->getTableName('cataloginventory_stock_item');
         if ($connection->isTableExists($stockItemTable)) {
-            foreach ($stockIds as $sId) {
-                try {
-                    $connection->insertOnDuplicate($stockItemTable, [
-                        'product_id' => $productId,
-                        'stock_id' => (int)$sId,
-                        'qty' => 99999,
-                        'is_in_stock' => 1,
-                        'manage_stock' => 0,
-                        'use_config_manage_stock' => 0
-                    ], ['qty', 'is_in_stock', 'manage_stock', 'use_config_manage_stock']);
-                } catch (\Throwable) {
-                }
+            try {
+                // Remove non-default stock rows to prevent duplicate stock items for this product
+                $connection->delete($stockItemTable, [
+                    'product_id = ?' => $productId,
+                    'stock_id != ?' => 1
+                ]);
+                $connection->insertOnDuplicate($stockItemTable, [
+                    'product_id' => $productId,
+                    'stock_id' => 1,
+                    'qty' => 99999,
+                    'is_in_stock' => 1,
+                    'manage_stock' => 0,
+                    'use_config_manage_stock' => 0
+                ], ['qty', 'is_in_stock', 'manage_stock', 'use_config_manage_stock']);
+            } catch (\Throwable) {
             }
         }
 
-        // 8. Populate legacy cataloginventory_stock_status table for admin (0) and all websites
+        // 8. Populate legacy cataloginventory_stock_status table (exactly ONE row: website_id = 0, stock_id = 1)
+        // Having multiple rows for the same product_id (e.g. across multiple websites or stocks) causes
+        // "Item (Magento\CatalogInventory\Model\Stock\Status) with the same ID already exists."
         $stockStatusTable = $this->resourceConnection->getTableName('cataloginventory_stock_status');
         if ($connection->isTableExists($stockStatusTable)) {
-            $allWebsites = array_unique(array_merge([0], $websiteIds));
-            foreach ($stockIds as $sId) {
-                foreach ($allWebsites as $webId) {
-                    try {
-                        $connection->insertOnDuplicate($stockStatusTable, [
-                            'product_id' => $productId,
-                            'website_id' => (int)$webId,
-                            'stock_id' => (int)$sId,
-                            'qty' => 99999,
-                            'stock_status' => 1
-                        ], ['qty', 'stock_status']);
-                    } catch (\Throwable) {
-                    }
-                }
+            try {
+                // Remove any non-global / non-default stock status rows for this product
+                $connection->delete($stockStatusTable, [
+                    'product_id = ?' => $productId,
+                    'website_id != ?' => 0
+                ]);
+                $connection->delete($stockStatusTable, [
+                    'product_id = ?' => $productId,
+                    'stock_id != ?' => 1
+                ]);
+                $connection->insertOnDuplicate($stockStatusTable, [
+                    'product_id' => $productId,
+                    'website_id' => 0,
+                    'stock_id' => 1,
+                    'qty' => 99999,
+                    'stock_status' => 1
+                ], ['qty', 'stock_status']);
+            } catch (\Throwable) {
             }
         }
 
