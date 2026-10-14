@@ -4,6 +4,7 @@
     <module name="TattvaDesign_ImageEditorApi">
         <sequence>
             <module name="Magento_GraphQl"/>
+            <module name="Magento_ConfigurableProduct"/>
         </sequence>
     </module>
 </config>

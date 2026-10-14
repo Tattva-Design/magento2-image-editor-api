@@ -1,0 +1,195 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1320" width="100%" height="100%" style="background:#0f172a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    
+    <!-- Glow & Shadow Filters -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
+    </filter>
+    
+    <!-- Arrow Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#34d399" />
+    </marker>
+    <marker id="arrowOrange" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#fb923c" />
+    </marker>
+    <marker id="arrowPurple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+    </marker>
+    <marker id="arrowCoral" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#f87171" />
+    </marker>
+  </defs>
+
+  <!-- Title Header -->
+  <text x="550" y="55" text-anchor="middle" fill="url(#headerGrad)" font-size="26" font-weight="800" letter-spacing="1">CUSTOMIZED FRAMES - CART &amp; ORDER API FLOW</text>
+  <text x="550" y="85" text-anchor="middle" fill="#94a3b8" font-size="14">Lifecycle of Project ID, Variant Resolution, Quote Isolation &amp; Order Placement</text>
+
+  <!-- ================= GROUP 1: FRONTEND (UI) ================= -->
+  <g transform="translate(100, 120)">
+    <!-- Container Card -->
+    <rect width="900" height="190" rx="16" fill="#1e293b" stroke="#0284c7" stroke-width="2" filter="url(#cardShadow)" />
+    <!-- Group Badge -->
+    <rect x="25" y="-14" width="280" height="28" rx="14" fill="#0284c7" />
+    <text x="165" y="5" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">1. FRONTEND / CUSTOMIZER</text>
+
+    <!-- Step 1.1 -->
+    <rect x="40" y="40" width="380" height="115" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="65" cy="65" r="14" fill="#0284c7" />
+    <text x="65" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">A</text>
+    <text x="90" y="65" fill="#f8fafc" font-size="15" font-weight="600">User Customizes Frame</text>
+    <text x="90" y="88" fill="#94a3b8" font-size="12.5">• Uploads / edits custom canvas image</text>
+    <text x="90" y="108" fill="#94a3b8" font-size="12.5">• Selects Size (A3/A4/A5), Frame, &amp; Paper Type</text>
+    <text x="90" y="128" fill="#94a3b8" font-size="12.5">• Calls: <tspan fill="#38bdf8">createImageEditorProject</tspan> mutation</text>
+
+    <!-- Connector within Group 1 -->
+    <path d="M 420 97 L 470 97" stroke="#38bdf8" stroke-width="2.5" marker-end="url(#arrow)" />
+
+    <!-- Step 1.2 -->
+    <rect x="480" y="40" width="380" height="115" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="505" cy="65" r="14" fill="#0284c7" />
+    <text x="505" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">B</text>
+    <text x="530" y="65" fill="#f8fafc" font-size="15" font-weight="600">Trigger Add to Cart</text>
+    <text x="530" y="88" fill="#94a3b8" font-size="12.5">• Receives generated <tspan fill="#38bdf8">project_uuid</tspan></text>
+    <text x="530" y="108" fill="#94a3b8" font-size="12.5">• Sends GraphQL mutation: <tspan fill="#38bdf8">addProductsToCart</tspan></text>
+    <text x="530" y="128" fill="#94a3b8" font-size="12.5">• Payload: <tspan fill="#cbd5e1">sku: "customisable-product", project_uuid</tspan></text>
+  </g>
+
+  <!-- Flow Connector 1 -> 2 -->
+  <path d="M 550 310 L 550 360" stroke="#fb923c" stroke-width="2.5" marker-end="url(#arrowOrange)" />
+
+  <!-- ================= GROUP 2: MAGENTO GRAPHQL & PLUGIN PROCESSING ================= -->
+  <g transform="translate(100, 360)">
+    <rect width="900" height="200" rx="16" fill="#1e293b" stroke="#ea580c" stroke-width="2" filter="url(#cardShadow)" />
+    <rect x="25" y="-14" width="320" height="28" rx="14" fill="#ea580c" />
+    <text x="185" y="5" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">2. GRAPHQL &amp; BUYREQUEST PLUGINS</text>
+
+    <!-- Step 2.1 -->
+    <rect x="40" y="40" width="380" height="130" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="65" cy="65" r="14" fill="#ea580c" />
+    <text x="65" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">C</text>
+    <text x="90" y="65" fill="#f8fafc" font-size="15" font-weight="600">GraphQlBuyRequestBuilderPlugin</text>
+    <text x="90" y="88" fill="#94a3b8" font-size="12">• Intercepts <tspan fill="#fb923c">afterBuild()</tspan> during add-to-cart</text>
+    <text x="90" y="108" fill="#94a3b8" font-size="12">• Queries <tspan fill="#cbd5e1">tattva_image_editor_project</tspan> by uuid</text>
+    <text x="90" y="128" fill="#94a3b8" font-size="12">• Fetches size, frame_type, and paper_type</text>
+    <text x="90" y="148" fill="#94a3b8" font-size="12">• Stores <tspan fill="#38bdf8">project_uuid</tspan> on BuyRequest</text>
+
+    <!-- Connector within Group 2 -->
+    <path d="M 420 105 L 470 105" stroke="#fb923c" stroke-width="2.5" marker-end="url(#arrowOrange)" />
+
+    <!-- Step 2.2 -->
+    <rect x="480" y="40" width="380" height="130" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="505" cy="65" r="14" fill="#ea580c" />
+    <text x="505" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">D</text>
+    <text x="530" y="65" fill="#f8fafc" font-size="15" font-weight="600">Super Attributes Mapping</text>
+    <text x="530" y="88" fill="#94a3b8" font-size="12">• <tspan fill="#fb923c">Size (138):</tspan> A3 (6), A4 (7), A5 (8)</text>
+    <text x="530" y="108" fill="#94a3b8" font-size="12">• <tspan fill="#fb923c">Frame (137):</tspan> With Frame (4), Without (5)</text>
+    <text x="530" y="128" fill="#94a3b8" font-size="12">• <tspan fill="#fb923c">Paper (139):</tspan> Art Paper (9), Canvas (10)</text>
+    <text x="530" y="148" fill="#94a3b8" font-size="12">• Injects array into <tspan fill="#38bdf8">super_attribute</tspan></text>
+  </g>
+
+  <!-- Flow Connector 2 -> 3 -->
+  <path d="M 550 560 L 550 610" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowGreen)" />
+
+  <!-- ================= GROUP 3: QUOTE ENGINE & ISOLATION ================= -->
+  <g transform="translate(100, 610)">
+    <rect width="900" height="190" rx="16" fill="#1e293b" stroke="#16a34a" stroke-width="2" filter="url(#cardShadow)" />
+    <rect x="25" y="-14" width="310" height="28" rx="14" fill="#16a34a" />
+    <text x="180" y="5" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">3. QUOTE ENGINE &amp; LINE ISOLATION</text>
+
+    <!-- Step 3.1 -->
+    <rect x="40" y="40" width="380" height="115" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="65" cy="65" r="14" fill="#16a34a" />
+    <text x="65" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">E</text>
+    <text x="90" y="65" fill="#f8fafc" font-size="15" font-weight="600">QuoteItemPlugin</text>
+    <text x="90" y="88" fill="#94a3b8" font-size="12.5">• <tspan fill="#34d399">aroundRepresentProduct()</tspan> inspection</text>
+    <text x="90" y="108" fill="#94a3b8" font-size="12.5">• Compares <tspan fill="#38bdf8">project_uuid</tspan> of quote item vs request</text>
+    <text x="90" y="128" fill="#94a3b8" font-size="12.5">• Returns <tspan fill="#ef4444">false</tspan> if UUID differs (No Merging!)</text>
+
+    <!-- Connector within Group 3 -->
+    <path d="M 420 97 L 470 97" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowGreen)" />
+
+    <!-- Step 3.2 -->
+    <rect x="480" y="40" width="380" height="115" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="505" cy="65" r="14" fill="#16a34a" />
+    <text x="505" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">F</text>
+    <text x="530" y="65" fill="#f8fafc" font-size="15" font-weight="600">Persistence on Quote Item</text>
+    <text x="530" y="88" fill="#94a3b8" font-size="12.5">• Creates independent line item in cart</text>
+    <text x="530" y="108" fill="#94a3b8" font-size="12.5">• Saves <tspan fill="#38bdf8">project_uuid</tspan> into <tspan fill="#cbd5e1">quote_item</tspan> column</text>
+    <text x="530" y="128" fill="#94a3b8" font-size="12.5">• Preserves custom frame options &amp; buyRequest</text>
+  </g>
+
+  <!-- Flow Connector 3 -> 4 -->
+  <path d="M 550 800 L 550 850" stroke="#c084fc" stroke-width="2.5" marker-end="url(#arrowPurple)" />
+
+  <!-- ================= GROUP 4: CART QUERY & DISPLAY ================= -->
+  <g transform="translate(100, 850)">
+    <rect width="900" height="190" rx="16" fill="#1e293b" stroke="#9333ea" stroke-width="2" filter="url(#cardShadow)" />
+    <rect x="25" y="-14" width="310" height="28" rx="14" fill="#9333ea" />
+    <text x="180" y="5" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">4. CART QUERY &amp; OUTPUT RESOLVERS</text>
+
+    <!-- Step 4.1 -->
+    <rect x="40" y="40" width="380" height="115" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="65" cy="65" r="14" fill="#9333ea" />
+    <text x="65" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">G</text>
+    <text x="90" y="65" fill="#f8fafc" font-size="15" font-weight="600">GetItemsDataPlugin &amp; Resolvers</text>
+    <text x="90" y="88" fill="#94a3b8" font-size="12.5">• Resolves <tspan fill="#c084fc">CartItemInterface.project_uuid</tspan></text>
+    <text x="90" y="108" fill="#94a3b8" font-size="12.5">• Dynamically overrides product name to project name</text>
+    <text x="90" y="128" fill="#94a3b8" font-size="12.5">• <tspan fill="#c084fc">CartItemProjectThumbnail</tspan> fetches thumbnail URL</text>
+
+    <!-- Connector within Group 4 -->
+    <path d="M 420 97 L 470 97" stroke="#c084fc" stroke-width="2.5" marker-end="url(#arrowPurple)" />
+
+    <!-- Step 4.2 -->
+    <rect x="480" y="40" width="380" height="115" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="505" cy="65" r="14" fill="#9333ea" />
+    <text x="505" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">H</text>
+    <text x="530" y="65" fill="#f8fafc" font-size="15" font-weight="600">UI Cart Display</text>
+    <text x="530" y="88" fill="#94a3b8" font-size="12.5">• Renders personalized frame preview thumbnail</text>
+    <text x="530" y="108" fill="#94a3b8" font-size="12.5">• Displays selected variant badge (e.g., A4 Canvas)</text>
+    <text x="530" y="128" fill="#94a3b8" font-size="12.5">• Ready for checkout or option updates</text>
+  </g>
+
+  <!-- Flow Connector 4 -> 5 -->
+  <path d="M 550 1040 L 550 1090" stroke="#f87171" stroke-width="2.5" marker-end="url(#arrowCoral)" />
+
+  <!-- ================= GROUP 5: CHECKOUT & ORDER CONVERSION ================= -->
+  <g transform="translate(100, 1090)">
+    <rect width="900" height="180" rx="16" fill="#1e293b" stroke="#e11d48" stroke-width="2" filter="url(#cardShadow)" />
+    <rect x="25" y="-14" width="310" height="28" rx="14" fill="#e11d48" />
+    <text x="180" y="5" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">5. CHECKOUT &amp; ORDER PLACEMENT</text>
+
+    <!-- Step 5.1 -->
+    <rect x="40" y="40" width="380" height="105" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="65" cy="65" r="14" fill="#e11d48" />
+    <text x="65" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">I</text>
+    <text x="90" y="65" fill="#f8fafc" font-size="15" font-weight="600">Quote to Order Conversion</text>
+    <text x="90" y="88" fill="#94a3b8" font-size="12.5">• <tspan fill="#f87171">etc/fieldset.xml</tspan> maps quote_item to order_item</text>
+    <text x="90" y="108" fill="#94a3b8" font-size="12.5">• <tspan fill="#f87171">QuoteToOrderItem</tspan> copies project_uuid &amp; options</text>
+    <text x="90" y="128" fill="#94a3b8" font-size="12.5">• Customer submits order (placeOrder mutation)</text>
+
+    <!-- Connector within Group 5 -->
+    <path d="M 420 92 L 470 92" stroke="#f87171" stroke-width="2.5" marker-end="url(#arrowCoral)" />
+
+    <!-- Step 5.2 -->
+    <rect x="480" y="40" width="380" height="105" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5" />
+    <circle cx="505" cy="65" r="14" fill="#e11d48" />
+    <text x="505" y="70" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">J</text>
+    <text x="530" y="65" fill="#f8fafc" font-size="15" font-weight="600">Fulfillment &amp; Admin View</text>
+    <text x="530" y="88" fill="#94a3b8" font-size="12.5">• Stored permanently in <tspan fill="#cbd5e1">sales_order_item</tspan></text>
+    <text x="530" y="108" fill="#94a3b8" font-size="12.5">• Production / Print API fetches project canvas</text>
+    <text x="530" y="128" fill="#94a3b8" font-size="12.5">• Frame printing &amp; assembly begins</text>
+  </g>
+</svg>

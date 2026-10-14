@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_quote_product_add_after">
+        <observer name="tattva_design_image_editor_quote_product_add_after"
+                  instance="TattvaDesign\ImageEditorApi\Observer\QuoteProductAddAfterObserver" />
+    </event>
+</config>

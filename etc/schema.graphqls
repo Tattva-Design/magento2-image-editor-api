@@ -2,11 +2,17 @@ scalar Json @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl
 
 type Query {
     imageEditorProjects(
+        status: String = "active" @doc(description: "Filter projects by status (defaults to active).")
         pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
         currentPage: Int = 1 @doc(description: "The current results page, starting from 1.")
     ): ImageEditorProjectListResult!
     @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\Projects")
     @doc(description: "Returns the current customer's image editor projects ordered by newest created first.")
+    imageEditorProjectByUuid(
+        uuid: String! @doc(description: "The project UUID.")
+    ): ImageEditorProject!
+    @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\ProjectByUuid")
+    @doc(description: "Returns a single project by its UUID for the current customer.")
     imageEditorProjectImages(
         projectUuid: String! @doc(description: "The project UUID.")
         pageSize: Int = 20 @doc(description: "How many items should be returned per page.")
@@ -73,6 +79,9 @@ input CreateImageEditorProjectInput {
     size: String! @doc(description: "The project size.")
     width: Int! @doc(description: "The project width.")
     height: Int! @doc(description: "The project height.")
+    productSku: String @doc(description: "The associated product SKU.")
+    frameType: String @doc(description: "The selected frame type.")
+    paperType: String @doc(description: "The selected paper type.")
 }
 
 input UpdateImageEditorProjectInput {
@@ -83,6 +92,10 @@ input UpdateImageEditorProjectInput {
     width: Int @doc(description: "The optional project width.")
     height: Int @doc(description: "The optional project height.")
     canvasObject: Json @doc(description: "The canvas object JSON structure.")
+    status: String @doc(description: "The project status.")
+    productSku: String @doc(description: "The associated product SKU.")
+    frameType: String @doc(description: "The selected frame type.")
+    paperType: String @doc(description: "The selected paper type.")
 }
 
 scalar Upload @implementation(class: "TattvaDesign\\ImageEditorApi\\Model\\GraphQl\\UploadType") @doc(description: "The Upload scalar type represents file uploads.")
@@ -148,6 +161,9 @@ type ImageEditorProject {
     width: Int! @doc(description: "The project width.")
     height: Int! @doc(description: "The project height.")
     status: String! @doc(description: "The project status.")
+    productSku: String @doc(description: "The associated product SKU.")
+    frameType: String @doc(description: "The selected frame type.")
+    paperType: String @doc(description: "The selected paper type.")
     canvasObject: Json @doc(description: "The stored canvas object JSON structure.")
     thumbnailUrl: String @doc(description: "The project's thumbnail image URL.")
     createdAt: String! @doc(description: "The project creation timestamp.")
@@ -186,3 +202,23 @@ type ImageEditorProjectImage {
     createdAt: String! @doc(description: "The image creation timestamp.")
     updatedAt: String! @doc(description: "The image last update timestamp.")
 }
+
+input CartItemInput {
+    project_uuid: String @doc(description: "The UUID of the image editor project associated with this cart item.")
+}
+
+interface CartItemInterface {
+    project_uuid: String @doc(description: "Associated image editor project UUID")
+}
+
+type SimpleCartItem {
+    project_thumbnail_url: String @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CartItemProjectThumbnail") @doc(description: "Project thumbnail image URL")
+    project_uuid: String @doc(description: "Associated image editor project UUID")
+}
+
+type ConfigurableCartItem {
+    project_thumbnail_url: String @resolver(class: "\\TattvaDesign\\ImageEditorApi\\Model\\Resolver\\CartItemProjectThumbnail") @doc(description: "Project thumbnail image URL")
+    project_uuid: String @doc(description: "Associated image editor project UUID")
+}
+
+

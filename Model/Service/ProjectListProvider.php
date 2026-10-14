@@ -21,18 +21,22 @@ class ProjectListProvider
     /**
      * Return the current customer's projects, ordered by newest first.
      */
-    public function getList(int $customerId, int $currentPage, int $pageSize): array
+    public function getList(int $customerId, int $currentPage, int $pageSize, string $status = 'active'): array
     {
         $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('tattva_image_editor_project');
         $storeId = (int) $this->storeManager->getStore()->getId();
 
-        $totalCount = (int) $connection->fetchOne(
-            $connection->select()
-                ->from($tableName, [new \Zend_Db_Expr('COUNT(*)')])
-                ->where('customer_id = ?', $customerId)
-                ->where('store_id = ?', $storeId)
-        );
+        $countSelect = $connection->select()
+            ->from($tableName, [new \Zend_Db_Expr('COUNT(*)')])
+            ->where('customer_id = ?', $customerId)
+            ->where('store_id = ?', $storeId);
+
+        if ($status !== 'all') {
+            $countSelect->where('status = ?', $status);
+        }
+
+        $totalCount = (int) $connection->fetchOne($countSelect);
 
         $totalPages = $pageSize > 0 ? (int) ceil($totalCount / $pageSize) : 0;
 
@@ -44,15 +48,20 @@ class ProjectListProvider
 
         $offset = ($currentPage - 1) * $pageSize;
 
-        $rows = $connection->fetchAll(
-            $connection->select()
-                ->from($tableName, $this->projectDataMapper->getSelectColumns())
-                ->where('customer_id = ?', $customerId)
-                ->where('store_id = ?', $storeId)
-                ->order('created_at ' . Select::SQL_DESC)
-                ->order('id ' . Select::SQL_DESC)
-                ->limit($pageSize, $offset)
-        );
+        $select = $connection->select()
+            ->from($tableName, $this->projectDataMapper->getSelectColumns())
+            ->where('customer_id = ?', $customerId)
+            ->where('store_id = ?', $storeId);
+
+        if ($status !== 'all') {
+            $select->where('status = ?', $status);
+        }
+
+        $select->order('created_at ' . Select::SQL_DESC)
+            ->order('id ' . Select::SQL_DESC)
+            ->limit($pageSize, $offset);
+
+        $rows = $connection->fetchAll($select);
 
         return [
             'totalCount' => $totalCount,
