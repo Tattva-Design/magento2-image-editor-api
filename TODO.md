@@ -7,6 +7,7 @@
   - `magento.quote_item, magento.tattva_image_editor_project, magento.sales_order_item, magento.sales_order, magento.quote`
 - enable the edit button in cart page so user can change the frame type and paper type only
 - [x] Need to check in admin that how the `customisable_product` product is manage (created/managed as a Configurable Product with 12 child simple variations for Size, Frame, and Paper)
+- [x] Assign MSI inventory source `framevala_inventory_source` and stock to configurable product & all 12 child variations, ensuring salable status and fixing "not found SKU" error in Add to Cart API
 - Need to verify that after adding the project in cart, we have to make sure that product doesn't visible in UI for that user and any other users too
 - [x] While adding the project into the cart from image-editor to framevala, we have to add that project as configurable_option not as a simple product
 - Need to check pricing, tax, discount, weight for our `customisable_product`

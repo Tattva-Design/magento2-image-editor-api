@@ -47,4 +47,12 @@
                 type="TattvaDesign\ImageEditorApi\Plugin\QuoteToOrderItem"
                 sortOrder="10"/>
     </type>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="tattva_image_editor_setup_product" xsi:type="object">TattvaDesign\ImageEditorApi\Console\Command\SetupCustomisableProductCommand</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

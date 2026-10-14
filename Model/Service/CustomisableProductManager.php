@@ -21,6 +21,8 @@ class CustomisableProductManager
     public const PRODUCT_NAME = 'Customisable Product';
     public const DEFAULT_PRICE = 500.00;
     public const DEFAULT_WEIGHT = 0.5;
+    public const INVENTORY_SOURCE_CODE = 'framevala_inventory_source';
+    public const SOURCE_FRAMEVALA = 'framevala_inventory_source';
 
     private const SIZE_OPTIONS = [
         'a3' => ['label' => 'A3', 'fallback_id' => 6, 'sort' => 1],
@@ -426,65 +428,305 @@ class CustomisableProductManager
     }
 
     /**
-     * Populate stock tables for a product ID and SKU.
+     * Get all 12 child simple SKUs.
+     *
+     * @return string[]
+     */
+    public function getAllChildSkus(): array
+    {
+        $skus = [];
+        foreach (array_keys(self::SIZE_OPTIONS) as $sizeKey) {
+            foreach (array_keys(self::FRAME_OPTIONS) as $frameKey) {
+                foreach (array_keys(self::PAPER_OPTIONS) as $paperKey) {
+                    $slugParts = [
+                        self::SKU,
+                        str_replace(' ', '-', $sizeKey),
+                        str_replace(' ', '-', $frameKey),
+                        str_replace(' ', '-', $paperKey)
+                    ];
+                    $skus[] = strtolower(implode('-', $slugParts));
+                }
+            }
+        }
+        return $skus;
+    }
+
+    /**
+     * Get all 13 SKUs (parent configurable SKU + 12 child simple SKUs).
+     *
+     * @return string[]
+     */
+    public function getAllSkus(): array
+    {
+        return array_merge([self::SKU], $this->getAllChildSkus());
+    }
+
+    /**
+     * Ensure customizable configurable product, 12 child products, and MSI/legacy stock assignments exist.
+     */
+    public function ensureStockAndSourceAssigned(): void
+    {
+        $connection = $this->resourceConnection->getConnection();
+        $productTable = $this->resourceConnection->getTableName('catalog_product_entity');
+        $superLinkTable = $this->resourceConnection->getTableName('catalog_product_super_link');
+
+        $parentId = (int)$connection->fetchOne(
+            $connection->select()->from($productTable, ['entity_id'])->where('sku = ?', self::SKU)
+        );
+
+        $childCount = 0;
+        if ($connection->isTableExists($superLinkTable) && $parentId) {
+            $childCount = (int)$connection->fetchOne(
+                $connection->select()->from($superLinkTable, ['count(*)'])->where('parent_id = ?', $parentId)
+            );
+        }
+
+        // If parent or children do not exist properly, recreate/update them
+        if (!$parentId || $childCount < 12) {
+            $parentId = $this->createOrUpdateConfigurableProduct();
+        }
+
+        // Collect all websites
+        $websiteIds = [];
+        try {
+            foreach ($this->storeManager->getWebsites() as $website) {
+                $websiteIds[] = (int)$website->getId();
+            }
+        } catch (\Throwable) {
+            // CLI fallback
+        }
+
+        $websiteTable = $this->resourceConnection->getTableName('store_website');
+        if ($connection->isTableExists($websiteTable)) {
+            try {
+                $fetchedWebs = $connection->fetchCol(
+                    $connection->select()->from($websiteTable, ['website_id'])->where('website_id > 0')
+                );
+                if (!empty($fetchedWebs)) {
+                    $websiteIds = array_unique(array_merge($websiteIds, array_map('intval', $fetchedWebs)));
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        // Fetch all 13 SKUs and their entity IDs
+        $allSkus = $this->getAllSkus();
+        $skuToId = $connection->fetchPairs(
+            $connection->select()->from($productTable, ['sku', 'entity_id'])->where('sku IN (?)', $allSkus)
+        );
+
+        foreach ($allSkus as $sku) {
+            $prodId = isset($skuToId[$sku]) ? (int)$skuToId[$sku] : 0;
+            if ($prodId > 0) {
+                $this->populateStock($prodId, $sku, $websiteIds);
+            }
+        }
+    }
+
+    /**
+     * Populate stock tables for a product ID and SKU across MSI and legacy tables.
      */
     private function populateStock(int $productId, string $sku, array $websiteIds): void
     {
         $connection = $this->resourceConnection->getConnection();
 
-        // 1. Populate legacy cataloginventory_stock_item table
-        $stockItemTable = $this->resourceConnection->getTableName('cataloginventory_stock_item');
-        if ($connection->isTableExists($stockItemTable)) {
-            $connection->insertOnDuplicate($stockItemTable, [
-                'product_id' => $productId,
-                'stock_id' => 1,
-                'qty' => 99999,
-                'is_in_stock' => 1,
-                'manage_stock' => 0,
-                'use_config_manage_stock' => 0
-            ]);
-        }
-
-        // 2. Populate legacy cataloginventory_stock_status table for admin (0) and all websites
-        $stockStatusTable = $this->resourceConnection->getTableName('cataloginventory_stock_status');
-        if ($connection->isTableExists($stockStatusTable)) {
-            $allWebsites = array_unique(array_merge([0], $websiteIds));
-            foreach ($allWebsites as $webId) {
-                $connection->insertOnDuplicate($stockStatusTable, [
-                    'product_id' => $productId,
-                    'website_id' => (int)$webId,
-                    'stock_id' => 1,
-                    'qty' => 99999,
-                    'stock_status' => 1
-                ]);
-            }
-        }
-
-        // 3. Populate MSI inventory_source_item table for all active inventory sources
-        $inventorySourceItemTable = $this->resourceConnection->getTableName('inventory_source_item');
-        if ($connection->isTableExists($inventorySourceItemTable)) {
-            $inventorySourceTable = $this->resourceConnection->getTableName('inventory_source');
-            $sources = ['default'];
-            if ($connection->isTableExists($inventorySourceTable)) {
+        // 1. Ensure inventory source framevala_inventory_source exists and is enabled
+        $sources = [self::SOURCE_FRAMEVALA];
+        $inventorySourceTable = $this->resourceConnection->getTableName('inventory_source');
+        if ($connection->isTableExists($inventorySourceTable)) {
+            $sourceExists = $connection->fetchOne(
+                $connection->select()->from($inventorySourceTable, ['source_code'])
+                    ->where('source_code = ?', self::SOURCE_FRAMEVALA)
+            );
+            if (!$sourceExists) {
                 try {
-                    $select = $connection->select()->from($inventorySourceTable, ['source_code']);
-                    $fetchedSources = $connection->fetchCol($select);
-                    if (!empty($fetchedSources)) {
-                        $sources = array_unique(array_merge($sources, $fetchedSources));
-                    }
+                    $connection->insert($inventorySourceTable, [
+                        'source_code' => self::SOURCE_FRAMEVALA,
+                        'name' => 'Framevala Inventory Source',
+                        'enabled' => 1,
+                        'country_id' => 'IN',
+                        'postcode' => '000000',
+                        'city' => 'Surat',
+                        'street' => 'Default Street'
+                    ]);
                 } catch (\Throwable) {
-                    // Fallback to default
                 }
             }
+        }
 
-            foreach ($sources as $sourceCode) {
+        // 2. Discover all stocks
+        $inventoryStockTable = $this->resourceConnection->getTableName('inventory_stock');
+        $stockIds = [1];
+        if ($connection->isTableExists($inventoryStockTable)) {
+            try {
+                $select = $connection->select()->from($inventoryStockTable, ['stock_id']);
+                $fetchedStocks = $connection->fetchCol($select);
+                if (!empty($fetchedStocks)) {
+                    $stockIds = array_unique(array_merge($stockIds, array_map('intval', $fetchedStocks)));
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        // 3. Link framevala_inventory_source to all stocks in inventory_source_stock_link
+        $sourceStockLinkTable = $this->resourceConnection->getTableName('inventory_source_stock_link');
+        if ($connection->isTableExists($sourceStockLinkTable)) {
+            foreach ($stockIds as $sId) {
+                try {
+                    $connection->insertOnDuplicate($sourceStockLinkTable, [
+                        'stock_id' => (int)$sId,
+                        'source_code' => self::SOURCE_FRAMEVALA,
+                        'priority' => 1
+                    ], ['priority']);
+                } catch (\Throwable) {
+                }
+            }
+        }
+
+        // 4. Ensure inventory_stock_sales_channel maps active websites to primary stock
+        $salesChannelTable = $this->resourceConnection->getTableName('inventory_stock_sales_channel');
+        $websiteTable = $this->resourceConnection->getTableName('store_website');
+        if ($connection->isTableExists($salesChannelTable) && $connection->isTableExists($websiteTable)) {
+            try {
+                $websites = $connection->fetchAll(
+                    $connection->select()->from($websiteTable, ['website_id', 'code'])
+                );
+                $primaryStockId = $stockIds[0] ?? 1;
+                foreach ($websites as $web) {
+                    $webCode = (string)$web['code'];
+                    if ($webCode === 'admin') {
+                        continue;
+                    }
+                    $existing = $connection->fetchOne(
+                        $connection->select()->from($salesChannelTable, ['stock_id'])
+                            ->where('type = ?', 'website')
+                            ->where('code = ?', $webCode)
+                    );
+                    if (!$existing) {
+                        $connection->insert($salesChannelTable, [
+                            'stock_id' => $primaryStockId,
+                            'type' => 'website',
+                            'code' => $webCode
+                        ]);
+                    }
+                }
+            } catch (\Throwable) {
+            }
+        }
+
+        // 5. Populate MSI inventory_source_item table - assign ONLY framevala_inventory_source
+        $inventorySourceItemTable = $this->resourceConnection->getTableName('inventory_source_item');
+        if ($connection->isTableExists($inventorySourceItemTable)) {
+            try {
+                // Remove other source assignments for this SKU so ONLY framevala_inventory_source is assigned
+                $connection->delete($inventorySourceItemTable, [
+                    'sku = ?' => $sku,
+                    'source_code != ?' => self::SOURCE_FRAMEVALA
+                ]);
+            } catch (\Throwable) {
+            }
+
+            try {
                 $connection->insertOnDuplicate($inventorySourceItemTable, [
-                    'source_code' => $sourceCode,
+                    'source_code' => self::SOURCE_FRAMEVALA,
                     'sku' => $sku,
                     'quantity' => 99999,
                     'status' => 1
-                ]);
+                ], ['quantity', 'status']);
+            } catch (\Throwable) {
             }
+        }
+
+        // 6. Populate MSI stock index tables (inventory_stock_{stock_id})
+        foreach ($stockIds as $sId) {
+            $stockIndexTable = $this->resourceConnection->getTableName('inventory_stock_' . $sId);
+            if ($connection->isTableExists($stockIndexTable)) {
+                try {
+                    $connection->insertOnDuplicate($stockIndexTable, [
+                        'sku' => $sku,
+                        'quantity' => 99999,
+                        'is_salable' => 1
+                    ], ['quantity', 'is_salable']);
+                } catch (\Throwable) {
+                }
+            }
+        }
+
+        // 7. Populate legacy cataloginventory_stock_item table for all stocks
+        $stockItemTable = $this->resourceConnection->getTableName('cataloginventory_stock_item');
+        if ($connection->isTableExists($stockItemTable)) {
+            foreach ($stockIds as $sId) {
+                try {
+                    $connection->insertOnDuplicate($stockItemTable, [
+                        'product_id' => $productId,
+                        'stock_id' => (int)$sId,
+                        'qty' => 99999,
+                        'is_in_stock' => 1,
+                        'manage_stock' => 0,
+                        'use_config_manage_stock' => 0
+                    ], ['qty', 'is_in_stock', 'manage_stock', 'use_config_manage_stock']);
+                } catch (\Throwable) {
+                }
+            }
+        }
+
+        // 8. Populate legacy cataloginventory_stock_status table for admin (0) and all websites
+        $stockStatusTable = $this->resourceConnection->getTableName('cataloginventory_stock_status');
+        if ($connection->isTableExists($stockStatusTable)) {
+            $allWebsites = array_unique(array_merge([0], $websiteIds));
+            foreach ($stockIds as $sId) {
+                foreach ($allWebsites as $webId) {
+                    try {
+                        $connection->insertOnDuplicate($stockStatusTable, [
+                            'product_id' => $productId,
+                            'website_id' => (int)$webId,
+                            'stock_id' => (int)$sId,
+                            'qty' => 99999,
+                            'stock_status' => 1
+                        ], ['qty', 'stock_status']);
+                    } catch (\Throwable) {
+                    }
+                }
+            }
+        }
+
+        // 9. Assign product to all websites in catalog_product_website
+        $productWebsiteTable = $this->resourceConnection->getTableName('catalog_product_website');
+        if ($connection->isTableExists($productWebsiteTable)) {
+            foreach ($websiteIds as $webId) {
+                if ($webId > 0) {
+                    try {
+                        $connection->insertOnDuplicate($productWebsiteTable, [
+                            'product_id' => $productId,
+                            'website_id' => (int)$webId
+                        ]);
+                    } catch (\Throwable) {
+                    }
+                }
+            }
+        }
+
+        // 10. Attempt official Magento MSI SourceItemsSaveInterface if available
+        try {
+            if (interface_exists('Magento\\InventoryApi\\Api\\SourceItemsSaveInterface')) {
+                $sourceItemsSave = \Magento\Framework\App\ObjectManager::getInstance()->get(
+                    'Magento\\InventoryApi\\Api\\SourceItemsSaveInterface'
+                );
+                $sourceItemFactory = \Magento\Framework\App\ObjectManager::getInstance()->get(
+                    'Magento\\InventoryApi\\Api\\Data\\SourceItemInterfaceFactory'
+                );
+                $itemsToSave = [];
+                foreach ($sources as $sourceCode) {
+                    $sourceItem = $sourceItemFactory->create();
+                    $sourceItem->setSourceCode($sourceCode);
+                    $sourceItem->setSku($sku);
+                    $sourceItem->setQuantity(99999);
+                    $sourceItem->setStatus(1);
+                    $itemsToSave[] = $sourceItem;
+                }
+                $sourceItemsSave->execute($itemsToSave);
+            }
+        } catch (\Throwable) {
         }
     }
 }
